@@ -1,0 +1,8 @@
+{
+  "maxDailyFollows": 50,
+  "maxDailyLikes": 200,
+  "minDelay": 1,
+  "maxDelay": 3,
+  "minDaysToCheckResource": 7,
+  "botWorkShiftHours": 16
+}

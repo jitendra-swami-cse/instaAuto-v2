@@ -1,0 +1,25 @@
+{
+  "name": "web-automation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "start0": "node ./index.js",
+    "start1": "node ./utils/testWithBrowser.js",
+    "start2": "node ./functionsLibrary/db.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "dotenv": "^16.5.0",
+    "fs-extra": "^11.3.0",
+    "lodash": "^4.17.21",
+    "puppeteer-core": "^23.6.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin": "^3.2.3",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
