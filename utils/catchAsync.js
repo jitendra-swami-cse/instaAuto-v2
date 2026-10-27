@@ -40,7 +40,7 @@ testFunction3.errorHandler = async function (err) {
  * @param {Function} fn - The async function to wrap
  * @returns {Function} - The wrapped function that forwards errors to error handler
  */
-const { askUser } = require("../utils/utils");
+const { askUser } = require("./utils");
 
 const readTaskAgain = async function () {
   // 1. Delete the cached Task

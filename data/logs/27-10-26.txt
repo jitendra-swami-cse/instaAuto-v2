@@ -1,0 +1,9 @@
+======= Instagram Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 27-10-26 11-06-27 =-=-=-=-=-=-
+00 minutes & 04 seconds
+
+--------- Successful Execution - Time Taken - [object Promise] ---------
+
+
+--------- Successful Execution - Time Taken - 00 minutes & 04 seconds ---------
+

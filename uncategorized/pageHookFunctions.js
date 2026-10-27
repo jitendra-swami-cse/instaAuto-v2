@@ -19,7 +19,13 @@
               - returns true if page is loaded,
               - returns false if page is not loaded in "options.timeOut" 
               - throws an error if "options.continueOnError" is set to "true" */
-const catchAsync = require("../uncategorized/catchAsync");
+const catchAsync = require("../utils/catchAsync");
+
+// class EnhancedPage {
+//   consturctor(page) {
+//     this.page = page;
+//   }
+// }
 
 const waitForPageLoad = async function (timeout = 120000) {
   return await this.page.waitForFunction(

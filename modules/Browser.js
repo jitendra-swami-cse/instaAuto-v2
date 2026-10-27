@@ -1,4 +1,6 @@
-const config = require("./ConfigManager");
+// const config = require("./ConfigManager");
+const ConfigManager = require("./ConfigManager");
+const AppLogger = require("./AppLogger");
 const { getBrowser } = require("../utils/getBrowser");
 const hookMethodsOnPage = require("../uncategorized/pageHookFunctions");
 
@@ -17,7 +19,7 @@ class Browser {
 
       const browserOptions = {
         profileTarget: profileTarget,
-        headless: config.headless,
+        headless: ConfigManager.browserConfig.headless || false,
       };
 
       const result = await getBrowser(browserOptions);
@@ -25,12 +27,21 @@ class Browser {
       this.page = result.page;
 
       // Hook custom methods to page
-      hookMethodsOnPage.call({ page: this.page }, this.page);
+      // hookMethodsOnPage.call({ page: this.page }, this.page);
+      hookMethodsOnPage.call(
+        {
+          browser: this.browser,
+          page: this.page,
+          utils: require("../utils/utils"),
+          appLogger: this.appLogger,
+        },
+        this.page,
+      );
 
       // Set permissions
-      const context = this.browser.defaultBrowserContext();
-      await context.overridePermissions("https://www.youtube.com/", []);
-
+      // const context = this.browser.defaultBrowserContext();
+      // await context.overridePermissions("https://www.youtube.com/", []);
+      // Check Developer Helper.md have the reason why above 3 lines are commented as flag ---deny-permission-prompts added in getBrowser.js .
       console.log(
         `Browser initialized successfully for profile: ${profileTarget}`,
       );
@@ -70,7 +81,19 @@ class Browser {
       throw error;
     }
   }
+  // Check if browser is ready
+  isReady() {
+    return this.browser !== null && this.page !== null;
+  }
 
+  // Get all open pages URLs (for debugging)
+  async getAllPagesUrls() {
+    if (!this.browser) return [];
+    const pages = await this.browser.pages();
+    return await Promise.all(pages.map((page) => page.url()));
+  }
+
+  // -------- Move Given Below Methods to Enhanced Page class.
   async getCurrentUrl() {
     if (!this.page) throw new Error("Browser not initialized");
     return await this.page.url();
@@ -231,18 +254,8 @@ class Browser {
       (Math.random() * (maxSeconds - minSeconds) + minSeconds) * 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
   }
-
-  // Check if browser is ready
-  isReady() {
-    return this.browser !== null && this.page !== null;
-  }
-
-  // Get all open pages URLs (for debugging)
-  async getAllPagesUrls() {
-    if (!this.browser) return [];
-    const pages = await this.browser.pages();
-    return await Promise.all(pages.map((page) => page.url()));
-  }
 }
 
 module.exports = new Browser();
+
+// ====== HelpFull Explainations for Nodes Like Me =====

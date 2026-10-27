@@ -22,10 +22,10 @@ exports.getBrowser = async (options) => {
   options.profileTarget ||= process.env.CHORME_TARGET_PROFILE;
   options.initialURL ||= process.env.INITIAL_URL;
   // Create some logic in future as the size & position depends on the current Machine.
-  options.windowSize ||= [816, 831]; // for JN's Laptop
-  // options.windowSize ||= [815, 789]; // for KL Sir's PC
-  options.windowPosition ||= [728, 0]; // for JN's Laptop
-  // options.windowPosition ||= [660, 0]; // for KL Sir's PC
+  // options.windowSize ||= [816, 831]; // for JN's Laptop
+  options.windowSize ||= [815, 789]; // for KL Sir's PC
+  // options.windowPosition ||= [728, 0]; // for JN's Laptop
+  options.windowPosition ||= [660, 0]; // for KL Sir's PC
   options.environment ||= process.env.ENVIRONMENT;
 
   const wsUrl = await getDebuggerUrl(
@@ -102,7 +102,11 @@ async function openChromeInstance(profileTarget, windowSize, windowPosition) {
   console.log(userDataDir);
 
   // On JN's Laptop
-  const openCommand = `"${chromePath}" --user-data-dir="${userDataDir}"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
+  // const openCommand = `"${chromePath}" --user-data-dir="${userDataDir}"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
+
+  const openCommand = `"${chromePath}" --user-data-dir="${userDataDir}"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y} --deny-permission-prompts`;
+  // What this does: --deny-permission-prompts is a Chromium flag that automatically denies every permission request (notifications, geolocation, camera, mic, etc.) for all origins, without needing to specify URLs one by one. It works at the browser level, so it covers every page your automation visits.
+
   // On KL Sir PC
   // const openCommand = `"${chromePath}" --user-data-dir="C:/Users/acer/Downloads/Jitu/InstaAutomation/Automation-App-by-JN-Data"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y}`;
   // On Store Keeper PC
