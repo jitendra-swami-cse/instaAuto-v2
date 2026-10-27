@@ -28,3 +28,172 @@ Here's what those two lines do:
   const openCommand = `"${chromePath}" --user-data-dir="${userDataDir}"  --profile-directory="Profile ${profileTarget}" --remote-debugging-port=${port} --window-size=${w},${h} --window-position=${x},${y} --deny-permission-prompts`;
   ```
   What this does: --deny-permission-prompts is a Chromium flag that automatically denies every permission request (notifications, geolocation, camera, mic, etc.) for all origins, without needing to specify URLs one by one. It works at the browser level, so it covers every page your automation visits.
+
+
+---
+
+# JavaScript `this` Context & Arrow Functions (Lexical Scope)
+
+### Problem: `TypeError: Cannot read properties of undefined (reading 'xyz')`
+
+Inside JavaScript ES6 classes, the code executes in **strict mode** by default. When you pass an instance method as a standalone callback/argument:
+
+```javascript
+// ❌ WRONG: Passing `this.waitForElementRobust` as an unbound parameter
+await utils.robustPolling(
+  waitSearchnClick,
+  options,
+  this.page,
+  textOrSelectorOrElement,
+  text,
+  this.waitForElementRobust // Passed as a bare function reference!
+);
+```
+
+And inside `waitSearchnClick` you call it as:
+```javascript
+await waitForElementRobust(...); // Invoked without a receiver object!
+```
+
+Because it was invoked without `this.`, its execution context (`this`) is lost and becomes `undefined`. When the method tries to access `this.page`, it fails with:
+`TypeError: Cannot read properties of undefined (reading 'page')`
+
+---
+
+### Solution: Arrow Functions Preserve Lexical `this`
+
+Unlike traditional `function` declarations (which define their own `this`), **arrow functions `() => {}` do not have their own `this`**. Instead, they inherit `this` directly from the enclosing scope (the class method where they are written). They also capture outer variables via **closure**.
+
+You **do not need** `.bind()`, `.call()`, or `.apply()`.
+
+#### ✅ The Clean & Optimized Pattern:
+Write the helper inside the method as an arrow function:
+
+```javascript
+async clickNotClickable(textOrSelectorOrElement, text) {
+  await this.waitForPageLoad();
+  await utils.randomDelay(0.75);
+
+  // Arrow function automatically captures `this` from EnhancedPage instance
+  // and outer variables (textOrSelectorOrElement, text) via closure!
+  const waitSearchnClick = async () => {
+    const element =
+      typeof textOrSelectorOrElement === "string"
+        ? await this.waitForElementRobust(textOrSelectorOrElement, text) // `this` is preserved!
+        : textOrSelectorOrElement;
+
+    if (!element) {
+      throw new Error(`Element not found: ${textOrSelectorOrElement}`);
+    }
+
+    const boundingBox = await element.boundingBox();
+    if (!boundingBox) {
+      throw new Error(`Bounding Box not found for: ${textOrSelectorOrElement}`);
+    }
+
+    const { x, y, width, height } = boundingBox;
+    await this.page.mouse.click(x + width / 2, y + height / 2); // `this.page` is preserved!
+    return true;
+  };
+
+  // No need to pass 4 arguments into robustPolling!
+  await utils.robustPolling(waitSearchnClick, {
+    maxAttempts: 9,
+    delayMs: 3000,
+    timeoutMs: 30000,
+    retryCondition: (result) => result === true,
+  });
+
+  await this.waitForPageLoad();
+}
+```
+
+### Quick Mental Checklist When `this` Is `undefined`:
+1. **Did I pass a class method as a callback or parameter without `()`?** (e.g. `poll(this.myMethod)`). If yes, `this` is lost.
+2. **Fix**: Wrap the invocation inside an arrow function `() => this.myMethod()`, or define the callback as an arrow function `const fn = async () => { await this.myMethod(); }`.
+3. Arrow functions eliminate the need for `.bind(this)` and manual argument threading through utility pollers.
+
+
+---
+
+# JavaScript `this` Context & Arrow Functions (Lexical Scope)
+
+### Problem: `TypeError: Cannot read properties of undefined (reading 'xyz')`
+
+Inside JavaScript ES6 classes, the code executes in **strict mode** by default. When you pass an instance method as a standalone callback/argument:
+
+```javascript
+// ❌ WRONG: Passing `this.waitForElementRobust` as an unbound parameter
+await utils.robustPolling(
+  waitSearchnClick,
+  options,
+  this.page,
+  textOrSelectorOrElement,
+  text,
+  this.waitForElementRobust // Passed as a bare function reference!
+);
+```
+
+And inside `waitSearchnClick` you call it as:
+```javascript
+await waitForElementRobust(...); // Invoked without a receiver object!
+```
+
+Because it was invoked without `this.`, its execution context (`this`) is lost and becomes `undefined`. When the method tries to access `this.page`, it fails with:
+`TypeError: Cannot read properties of undefined (reading 'page')`
+
+---
+
+### Solution: Arrow Functions Preserve Lexical `this`
+
+Unlike traditional `function` declarations (which define their own `this`), **arrow functions `() => {}` do not have their own `this`**. Instead, they inherit `this` directly from the enclosing scope (the class method where they are written). They also capture outer variables via **closure**.
+
+You **do not need** `.bind()`, `.call()`, or `.apply()`.
+
+#### ✅ The Clean & Optimized Pattern:
+Write the helper inside the method as an arrow function:
+
+```javascript
+async clickNotClickable(textOrSelectorOrElement, text) {
+  await this.waitForPageLoad();
+  await utils.randomDelay(0.75);
+
+  // Arrow function automatically captures `this` from EnhancedPage instance
+  // and outer variables (textOrSelectorOrElement, text) via closure!
+  const waitSearchnClick = async () => {
+    const element =
+      typeof textOrSelectorOrElement === "string"
+        ? await this.waitForElementRobust(textOrSelectorOrElement, text) // `this` is preserved!
+        : textOrSelectorOrElement;
+
+    if (!element) {
+      throw new Error(`Element not found: ${textOrSelectorOrElement}`);
+    }
+
+    const boundingBox = await element.boundingBox();
+    if (!boundingBox) {
+      throw new Error(`Bounding Box not found for: ${textOrSelectorOrElement}`);
+    }
+
+    const { x, y, width, height } = boundingBox;
+    await this.page.mouse.click(x + width / 2, y + height / 2); // `this.page` is preserved!
+    return true;
+  };
+
+  // No need to pass 4 arguments into robustPolling!
+  await utils.robustPolling(waitSearchnClick, {
+    maxAttempts: 9,
+    delayMs: 3000,
+    timeoutMs: 30000,
+    retryCondition: (result) => result === true,
+  });
+
+  await this.waitForPageLoad();
+}
+```
+
+### Quick Mental Checklist When `this` Is `undefined`:
+1. **Did I pass a class method as a callback or parameter without `()`?** (e.g. `poll(this.myMethod)`). If yes, `this` is lost.
+2. **Fix**: Wrap the invocation inside an arrow function `() => this.myMethod()`, or define the callback as an arrow function `const fn = async () => { await this.myMethod(); }`.
+3. Arrow functions eliminate the need for `.bind(this)` and manual argument threading through utility pollers.
+

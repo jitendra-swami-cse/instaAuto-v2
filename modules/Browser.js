@@ -2,7 +2,8 @@
 const ConfigManager = require("./ConfigManager");
 const AppLogger = require("./AppLogger");
 const { getBrowser } = require("../utils/getBrowser");
-const hookMethodsOnPage = require("../uncategorized/pageHookFunctions");
+const EnhancedPage = require("./EnhancedPage");
+// const hookMethodsOnPage = require("../uncategorized/pageHookFunctions");
 
 class Browser {
   constructor() {
@@ -27,16 +28,16 @@ class Browser {
       this.page = result.page;
 
       // Hook custom methods to page
-      // hookMethodsOnPage.call({ page: this.page }, this.page);
-      hookMethodsOnPage.call(
-        {
-          browser: this.browser,
-          page: this.page,
-          utils: require("../utils/utils"),
-          appLogger: this.appLogger,
-        },
-        this.page,
-      );
+      // hookMethodsOnPage.call(
+      //   {
+      //     browser: this.browser,
+      //     page: this.page,
+      //     utils: require("../utils/utils"),
+      //     appLogger: this.appLogger,
+      //   },
+      //   this.page,
+      // );
+      await EnhancedPage.attachPage(this.page);
 
       // Set permissions
       // const context = this.browser.defaultBrowserContext();
@@ -91,6 +92,15 @@ class Browser {
     if (!this.browser) return [];
     const pages = await this.browser.pages();
     return await Promise.all(pages.map((page) => page.url()));
+  }
+
+  // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
+
+  async listAllPages() {
+    const pages = await this.browser.pages();
+    for (const page of pages) {
+      console.log(`Page URL: ${page.url()}`);
+    }
   }
 
   // -------- Move Given Below Methods to Enhanced Page class.
