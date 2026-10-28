@@ -109,17 +109,6 @@ class Browser {
     return await this.page.url();
   }
 
-  async navigateTo(url) {
-    if (!this.page) throw new Error("Browser not initialized");
-    console.log(`Navigating to: ${url}`);
-    await this.page.goto(url, { waitUntil: "networkidle0" });
-  }
-
-  async waitForPageLoad() {
-    if (!this.page) throw new Error("Browser not initialized");
-    await this.page.waitForPageLoad();
-  }
-
   // Instagram specific navigation methods
   async goToInstagramHome() {
     try {

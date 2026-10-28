@@ -55,11 +55,17 @@ const robustPolling = async (func, options = {}, ...args) => {
     infintiePolling = false, // if true then no maxAttempts and no timeoutMs, just keep polling until func returns true or stopped manually.
   } = options;
 
+  // console.log(`options passed to robustingPolling are as below -> ${JSON.stringify(options)}`);
+
   return new Promise(async (resolve, reject) => {
     let attempts = 0;
+    let errMSG = "Polling condition not satisfied";
     const startTime = Date.now();
 
-    while (infintiePolling || (attempts < maxAttempts && Date.now() - startTime < timeoutMs)) {
+    while (
+      infintiePolling ||
+      (attempts < maxAttempts && Date.now() - startTime < timeoutMs)
+    ) {
       attempts++;
       try {
         const result = await func(...args);
@@ -70,7 +76,9 @@ const robustPolling = async (func, options = {}, ...args) => {
           return;
         }
       } catch (err) {
-        errMSG = err.message || "Error msg not defined in Options Object passed to robustPolling func";
+        errMSG =
+          err.message ||
+          "Error msg not defined in Options Object passed to robustPolling func";
         console.log(`Attempt ${attempts} failed with error:`, errMSG);
       }
 
@@ -79,7 +87,9 @@ const robustPolling = async (func, options = {}, ...args) => {
 
     // Handle end of polling based on rejectOnEnd flag
     if (rejectOnEnd) {
-      reject(`Function failed after ${attempts} attempts. with Error: ${errMSG}`);
+      reject(
+        `Function failed after ${attempts} attempts. with Error: ${errMSG}`,
+      );
     } else {
       resolve(null);
     }
@@ -96,7 +106,8 @@ exports.robustPolling = robustPolling;
  * @param {number} minSec The minimum delay in seconds. default is 0.25 seconds.
  */
 const randomDelay = async (maxSec = 0.45, minSec = 0.25) => {
-  const delayTime = (Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100;
+  const delayTime =
+    (Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100;
   console.log(`Random Delay for ${delayTime}ms.`);
   await delay(delayTime);
 };
@@ -105,7 +116,8 @@ exports.randomDelay = randomDelay;
 //   await delay((Math.floor(Math.random() * (maxSec - minSec) * 10) + minSec * 10) * 100);
 // };
 
-const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getRandomNumber = (min, max) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 exports.getRandomNumber = getRandomNumber;
 
 const getDateTime = () => {
@@ -119,7 +131,9 @@ const getDateTime = () => {
     hour12: true,
     timeZone: "Asia/Kolkata",
   };
-  const indianDateTime = date.toLocaleString("en-IN", options).replace(/\//g, "-");
+  const indianDateTime = date
+    .toLocaleString("en-IN", options)
+    .replace(/\//g, "-");
   return indianDateTime;
 };
 exports.getDateTime = getDateTime;
@@ -140,8 +154,13 @@ async function askUser(question) {
 exports.askUser = askUser;
 
 async function devWaitCheckContinue() {
-  await fs.writeFile("./data/thisAtThisPoint.json", JSON.stringify(this, null, 2));
-  const answer = await askUser("Press Enter to continue or type 'e' to stop the script: ");
+  await fs.writeFile(
+    "./data/thisAtThisPoint.json",
+    JSON.stringify(this, null, 2),
+  );
+  const answer = await askUser(
+    "Press Enter to continue or type 'e' to stop the script: ",
+  );
   if (answer.toLowerCase() === "exit") {
     console.log("Exiting the script as per user request.");
     process.exit(0);
@@ -169,7 +188,8 @@ function removeDuplicates(arr, keyFields, latestField) {
   const map = new Map();
   for (const item of arr) {
     // If keyFields not provided, use all keys of the object
-    const fields = keyFields && keyFields.length ? keyFields : Object.keys(item).sort(); // sort for consistent key order
+    const fields =
+      keyFields && keyFields.length ? keyFields : Object.keys(item).sort(); // sort for consistent key order
     const key = fields.map((f) => String(item[f])).join("|");
     if (!map.has(key)) {
       map.set(key, item);

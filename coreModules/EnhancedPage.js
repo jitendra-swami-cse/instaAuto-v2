@@ -1,3 +1,25 @@
+// List of methods available on EnhancedPage
+// 👇 Tested Working 👇
+// attachPage
+// navigateTo
+// clickNotClickable
+// typeHuman
+// getText
+// waitForURLChange
+// listAllElementsTag
+// getAllElementIds
+// listAllElementsText
+// listAllElementsTextAndSelector
+
+// listAllFrames
+// waitForPageLoad
+// goBackToPreviousPage
+// waitForElementRobust
+// checkVisibilityBeforeClick
+
+// addResponseListener
+// addRequestListener
+
 // Requiremented methods on page objects:
 /* 
   
@@ -37,6 +59,7 @@ class EnhancedPage {
       { timeout }, // Set timeout to 10 minutes in rare coditions.
     );
   }
+
   async navigateTo(url) {
     try {
       console.log(`Page.navigateTo(${url}) called.`);
@@ -59,6 +82,7 @@ class EnhancedPage {
       console.log(`Error in Page.navigateTo(${url}) is as: ${error.message}`);
     }
   }
+
   async goBackToPreviousPage() {
     try {
       console.log(`Page.goBack() called...`);
@@ -76,6 +100,7 @@ class EnhancedPage {
       console.log(`Error in Page.navigateTo() is as: ${error.message}`);
     }
   }
+
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
   async waitForElementRobust(textOrSelector, text = false) {
     // text = false;
@@ -141,16 +166,18 @@ class EnhancedPage {
     await this.waitForPageLoad();
   }
 
-  async getText(selectorStringOrElement) {
+  getText = async (selectorStringOrElement) => {
     let el;
-    if (typeof selectorStringOrElement === "string")
-      el = await this.page.locator(selector).waitHandle();
-    else el = selectorStringOrElement;
+    if (typeof selectorStringOrElement === "string") {
+      el = await this.page.locator(selectorStringOrElement).waitHandle();
+    } else {
+      el = selectorStringOrElement;
+    }
     const text = await this.page.evaluate((element) => element.textContent, el);
     return text;
-  }
+  };
 
-  async typeHuman(selector, stringToType) {
+  typeHuman = async (selector, stringToType) => {
     const options = {
       backspaceMaximumDelayInMs: 750 * 2,
       backspaceMinimumDelayInMs: 750,
@@ -214,10 +241,10 @@ class EnhancedPage {
       // Type the character normally
       await inputField.type(typedChar, { delay });
     }
-  }
+  };
 
   // ========== 👆 Above Code is Checked not tested 👆 ==========
-  async checkVisibilityBeforeClick(selector) {
+  checkVisibilityBeforeClick = async (selector) => {
     return await this.page.evaluate((selector) => {
       const subBTN = Array.from(document.querySelectorAll(selector)).find(
         (el) => el.checkVisibility(),
@@ -226,7 +253,7 @@ class EnhancedPage {
       // return subBTN.textContent;
       return subBTN;
     }, selector);
-  }
+  };
 
   /**
    * Waits for the page URL to change from the given beforePageURL.
@@ -241,76 +268,188 @@ class EnhancedPage {
    * @param {number} timeoutMs - The timeout in milliseconds after which the method will return false. Default is 30000.
    * @returns {(string | false)} The new URL if the URL changed, false otherwise.
    */
-  async waitForURLChange(
+  waitForURLChange = async (
     beforePageURL,
     maxAttempts = 5,
     delayMs = 3000,
     timeoutMs = 30000,
-  ) {
+  ) => {
     let flag;
     try {
       flag = await utils.robustPolling(
         async () => {
-          if (this.url() !== beforePageURL) {
+          if (this.page.url() !== beforePageURL) {
             await this.waitForPageLoad();
-            return this.url();
-          } else return false;
+            return this.page.url();
+          }
+          throw new Error(
+            `URL has not changed yet. Still on: ${beforePageURL}`,
+          );
         },
         {
-          maxAttempts: 5,
-          delayMs: 3000,
-          timeoutMs: 30000,
+          maxAttempts,
+          delayMs,
+          timeoutMs,
           // retryCondition: (result) => result === true,   //uncommenting this creates an undetectable bug
         },
       );
     } catch (error) {
       console.log(`--------- Error in waitForURLChange ---------`);
       console.log(`beforePageURL: ${beforePageURL}`);
-      console.log(`this.url(): ${this.url()}`);
+      console.log(`this.page.url(): ${this.page.url()}`);
       console.log(`error: ${error}`);
       console.log(`--------- Error in waitForURLChange ---------`);
       flag = false;
     } finally {
       return flag;
     }
-  }
+  };
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
 
-  async listAllFrames() {
+  listAllFrames = async () => {
     const frames = this.page.frames();
     for (const frame of frames) {
       console.log(`Frame URL: ${frame.url()}`);
     }
-  }
-  async listAllElements() {
+  };
+
+  listAllElementsTag = async () => {
     const elements = await this.page.$$("*");
     for (const element of elements) {
       const tagName = await element.evaluate((el) => el.tagName);
       console.log(`Element: ${tagName}`);
     }
-  }
+  };
 
-  async listAllElementsText() {
-    const elements = await this.page.$$("*");
-    for (const element of elements) {
-      const tagName = await element.evaluate((el) => el.tagName);
-      const textContent = await element.evaluate((el) => el.textContent);
-      console.log(`Element: ${tagName}, Text: ${textContent}`);
-    }
-  }
+  getAllElementIds = async (unique = false) => {
+    const isUnique =
+      typeof unique === "object" && unique !== null
+        ? Boolean(unique.unique)
+        : Boolean(unique);
 
-  async listAllElementsTextAndSelector() {
-    const elements = await this.page.$$("*");
-    for (const element of elements) {
-      const tagName = await element.evaluate((el) => el.tagName);
-      const textContent = await element.evaluate((el) => el.textContent);
-      const selector = await element.evaluate((el) => el.outerHTML);
-      console.log(
-        `Element: ${tagName}, Text: ${textContent}, Selector: ${selector}`,
+    return await this.page.evaluate((isUnique) => {
+      const ids = Array.from(
+        document.querySelectorAll("[id]"),
+        (el) => el.id,
+      ).filter(Boolean);
+      if (!isUnique) return ids;
+
+      const counts = ids.reduce(
+        (acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc),
+        {},
       );
-    }
-  }
+      return ids.filter((id) => counts[id] === 1);
+    }, isUnique);
+  };
+
+  listAllElementsText = async () => {
+    return await this.page.evaluate(() => {
+      const allElements = Array.from(document.querySelectorAll("*"));
+      const elementsWithDirectText = [];
+
+      for (const el of allElements) {
+        // Skip non-visible / script / style tags
+        if (["SCRIPT", "STYLE", "NOSCRIPT", "IFRAME"].includes(el.tagName)) {
+          continue;
+        }
+
+        // Filter direct text child nodes with non-empty content
+        const directText = Array.from(el.childNodes)
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.textContent.trim())
+          .filter(Boolean)
+          .join(" ");
+
+        if (directText.length > 0) {
+          elementsWithDirectText.push({
+            tagName: el.tagName.toLowerCase(),
+            text: directText,
+          });
+        }
+      }
+
+      return elementsWithDirectText;
+    });
+  };
+
+  listAllElementsTextAndSelector = async () => {
+    return await this.page.evaluate(() => {
+      const allElements = Array.from(document.querySelectorAll("*"));
+      const result = [];
+
+      // Helper to generate a useful, actionable CSS selector
+      const getBestSelector = (el) => {
+        if (el.id) {
+          return `#${CSS.escape(el.id)}`;
+        }
+        if (el.getAttribute("name")) {
+          return `${el.tagName.toLowerCase()}[name="${CSS.escape(el.getAttribute("name"))}"]`;
+        }
+        if (el.getAttribute("aria-label")) {
+          return `${el.tagName.toLowerCase()}[aria-label="${CSS.escape(el.getAttribute("aria-label"))}"]`;
+        }
+        if (el.getAttribute("role")) {
+          return `${el.tagName.toLowerCase()}[role="${CSS.escape(el.getAttribute("role"))}"]`;
+        }
+        if (el.className && typeof el.className === "string") {
+          const classes = el.className
+            .trim()
+            .split(/\s+/)
+            .filter((c) => c && !c.includes(":") && !c.includes("/"));
+          if (classes.length > 0) {
+            const classSel = `${el.tagName.toLowerCase()}.${classes
+              .slice(0, 2)
+              .map((c) => CSS.escape(c))
+              .join(".")}`;
+            if (document.querySelectorAll(classSel).length === 1) {
+              return classSel;
+            }
+          }
+        }
+        const parent = el.parentElement;
+        if (!parent || parent === document.body) {
+          return el.tagName.toLowerCase();
+        }
+        const siblings = Array.from(parent.children).filter(
+          (c) => c.tagName === el.tagName,
+        );
+        const index = siblings.indexOf(el) + 1;
+        const parentPrefix = parent.id ? `#${CSS.escape(parent.id)} > ` : "";
+        return `${parentPrefix}${el.tagName.toLowerCase()}:nth-of-type(${index})`;
+      };
+
+      for (const el of allElements) {
+        // Skip script / style / invisible tags
+        if (["SCRIPT", "STYLE", "NOSCRIPT", "IFRAME"].includes(el.tagName)) {
+          continue;
+        }
+
+        // Direct text child nodes only
+        const directText = Array.from(el.childNodes)
+          .filter((node) => node.nodeType === Node.TEXT_NODE)
+          .map((node) => node.textContent.trim())
+          .filter(Boolean)
+          .join(" ");
+
+        if (directText.length > 0) {
+          const openingTag = el.outerHTML.slice(
+            0,
+            el.outerHTML.indexOf(">") + 1,
+          );
+
+          result.push({
+            tagName: el.tagName.toLowerCase(),
+            text: directText,
+            selector: getBestSelector(el),
+            openingTag,
+          });
+        }
+      }
+
+      return result;
+    });
+  };
   // ==== 👇🏻 Event Handler 👇🏻 ====
 
   /**
@@ -321,7 +460,7 @@ class EnhancedPage {
    * @param {Function} handlerFn - Function to handle filtered responses.
    * @returns {Function} removeListener - Call this to remove the listener.
    */
-  async addResponseListener(filterFn, handlerFn) {
+  addResponseListener = async (filterFn, handlerFn) => {
     if (!this.page) {
       throw new Error("Page instance is required");
     }
@@ -353,7 +492,7 @@ class EnhancedPage {
     return () => {
       this.page.off("response", listener);
     };
-  }
+  };
 
   /** * Adds a temporary 'request' listener to the page.
    * Returns a function that removes the listener when called.
@@ -361,7 +500,7 @@ class EnhancedPage {
    * @param {Function} handlerFn - Function to handle filtered requests.
    * @return {Function} removeListener - Call this to remove the listener.
    * */
-  async addRequestListener(filterFn, handlerFn) {
+  addRequestListener = async (filterFn, handlerFn) => {
     if (!this.page) {
       throw new Error("Page instance is required");
     }
@@ -404,7 +543,7 @@ class EnhancedPage {
       this.page.off("request", listener);
       this.page.setRequestInterception(false); // Disable request interception
     };
-  }
+  };
 }
 
 module.exports = new EnhancedPage();
@@ -418,7 +557,7 @@ async function addEventHandlerOnPage() {
   this.on("load", async () => {
     console.log("Page loaded, taking screenshot...");
     try {
-      this.log("nav", `Page loaded, Page URL: ${this.url()}`);
+      this.log("nav", `Page loaded, Page URL: ${this.page.url()}`);
 
       await this.screenshot({
         path: `./Data/Screenshots/${utils.getDateTime().split(",")[0]}__${
@@ -442,7 +581,7 @@ async function log(type = "act", message) {
     this.actionList.push(message);
   } else if (type === "nav") {
     prefix = `Navigation ${this.pageNavigationList.length}`;
-    this.pageNavigationList.push(this.url());
+    this.pageNavigationList.push(this.page.url());
   } else if (type === "err") {
     prefix = `⚠️ Error ${this.errorList.length}`;
     this.errorList.push(message);
