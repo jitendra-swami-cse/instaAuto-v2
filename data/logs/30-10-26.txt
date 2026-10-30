@@ -1,0 +1,10 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 30-10-26 11-38-11 =-=-=-=-=-=-
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Completed Navigation to chrome://new-tab-page/
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Completed Navigation to chrome://new-tab-page/

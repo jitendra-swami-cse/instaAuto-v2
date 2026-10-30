@@ -42,6 +42,7 @@
               - returns false if page is not loaded in "options.timeOut" 
               - throws an error if "options.continueOnError" is set to "true" */
 // const catchAsync = require("../utils/catchAsync");
+const AppLogger = require("../coreModules/AppLogger");
 const utils = require("../utils/utils");
 
 class EnhancedPage {
@@ -49,23 +50,23 @@ class EnhancedPage {
     this.page = null;
   }
 
-  async attachPage(page) {
+  attachPage = async (page) => {
     this.page = page;
-  }
+  };
 
-  async waitForPageLoad(timeout = 120000) {
+  waitForPageLoad = async (timeout = 120000) => {
     return await this.page.waitForFunction(
       () => document.readyState === "complete",
       { timeout }, // Set timeout to 10 minutes in rare coditions.
     );
-  }
+  };
 
-  async navigateTo(url) {
+  navigateTo = async (url) => {
     try {
-      console.log(`Page.navigateTo(${url}) called.`);
+      AppLogger.logMSG(`Page.navigateTo(${url}) called.`);
       const currentURL = this.page.url();
       if (currentURL.includes(url)) {
-        console.log(`Already on ${url}.`);
+        AppLogger.logMSG(`Already on ${url}.`);
         return;
       }
       await this.page.goto(url, {
@@ -77,15 +78,17 @@ class EnhancedPage {
         domContentLoaded: true, // Wait for DOMContentLoaded event
         // defaultViewport: { width: 1920, height: 1080 }, // Custom viewport settings
       });
-      console.log(`Completed Navigation to ${currentURL}`);
+      AppLogger.logMSG(`Completed Navigation to ${currentURL}`);
     } catch (error) {
-      console.log(`Error in Page.navigateTo(${url}) is as: ${error.message}`);
+      AppLogger.logMSG(
+        `Error in Page.navigateTo(${url}) is as: ${error.message}`,
+      );
     }
-  }
+  };
 
-  async goBackToPreviousPage() {
+  goBackToPreviousPage = async () => {
     try {
-      console.log(`Page.goBack() called...`);
+      AppLogger.logMSG(`Page.goBack() called...`);
       await this.page.goBack({
         waitUntil: "networkidle0", // Wait until network is idle
         timeout: 300000, // 5 minutes Timeout in milliseconds
@@ -95,24 +98,24 @@ class EnhancedPage {
         domContentLoaded: true, // Wait for DOMContentLoaded event
         // defaultViewport: { width: 1920, height: 1080 }, // Custom viewport settings
       });
-      console.log(`Completed Back Navigation.`);
+      AppLogger.logMSG(`Completed Back Navigation.`);
     } catch (error) {
-      console.log(`Error in Page.navigateTo() is as: ${error.message}`);
+      AppLogger.logMSG(`Error in Page.navigateTo() is as: ${error.message}`);
     }
-  }
+  };
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
-  async waitForElementRobust(textOrSelector, text = false) {
+  waitForElementRobust = async (textOrSelector, text = false) => {
     // text = false;
     let selectorString =
       text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
-    console.log(`selectorString: ${selectorString}`);
+    AppLogger.logMSG(`selectorString: ${selectorString}`);
 
     const element = await this.page.locator(selectorString).waitHandle();
     if (!element) {
       return false;
     } else return element;
-  }
+  };
 
   /**
    * Attempts to click on an element that is not immediately clickable on a page.
@@ -129,7 +132,7 @@ class EnhancedPage {
   /**
    * Attempts to click on an element that is not immediately clickable on a page.
    */
-  async clickNotClickable(textOrSelectorOrElement, text) {
+  clickNotClickable = async (textOrSelectorOrElement, text) => {
     await this.waitForPageLoad();
     await utils.randomDelay(0.75);
 
@@ -164,7 +167,7 @@ class EnhancedPage {
     });
 
     await this.waitForPageLoad();
-  }
+  };
 
   getText = async (selectorStringOrElement) => {
     let el;
@@ -194,7 +197,9 @@ class EnhancedPage {
 
     // Clear the input field
     await inputField.evaluate((el) => (el.value = ""));
-    console.log(`----- stringToType: ${stringToType} ---causing the error --`);
+    AppLogger.logMSG(
+      `----- stringToType: ${stringToType} ---causing the error --`,
+    );
 
     for (let char of stringToType) {
       // Simulate typing delay
@@ -294,11 +299,11 @@ class EnhancedPage {
         },
       );
     } catch (error) {
-      console.log(`--------- Error in waitForURLChange ---------`);
-      console.log(`beforePageURL: ${beforePageURL}`);
-      console.log(`this.page.url(): ${this.page.url()}`);
-      console.log(`error: ${error}`);
-      console.log(`--------- Error in waitForURLChange ---------`);
+      AppLogger.logMSG(`--------- Error in waitForURLChange ---------`);
+      AppLogger.logMSG(`beforePageURL: ${beforePageURL}`);
+      AppLogger.logMSG(`this.page.url(): ${this.page.url()}`);
+      AppLogger.logMSG(`error: ${error}`);
+      AppLogger.logMSG(`--------- Error in waitForURLChange ---------`);
       flag = false;
     } finally {
       return flag;
@@ -310,7 +315,7 @@ class EnhancedPage {
   listAllFrames = async () => {
     const frames = this.page.frames();
     for (const frame of frames) {
-      console.log(`Frame URL: ${frame.url()}`);
+      AppLogger.logMSG(`Frame URL: ${frame.url()}`);
     }
   };
 
@@ -318,7 +323,7 @@ class EnhancedPage {
     const elements = await this.page.$$("*");
     for (const element of elements) {
       const tagName = await element.evaluate((el) => el.tagName);
-      console.log(`Element: ${tagName}`);
+      AppLogger.logMSG(`Element: ${tagName}`);
     }
   };
 

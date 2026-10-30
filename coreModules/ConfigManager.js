@@ -28,13 +28,13 @@ class ConfigManager {
     this.browserConfig = {};
   }
 
-  loadAll() {
+  loadAll = () => {
     this.instaConfig = this.loadJson(this.instaConfigPath, {});
     this.browserConfig = this.loadJson(this.browserConfigPath, {});
     console.log("[ConfigManager] Configuration loaded.");
-  }
+  };
 
-  loadJson(filePath, defaultValue) {
+  loadJson = (filePath, defaultValue) => {
     try {
       if (fs.existsSync(filePath)) {
         const data = fs.readFileSync(filePath, "utf-8");
@@ -47,7 +47,7 @@ class ConfigManager {
       );
     }
     return defaultValue;
-  }
+  };
 
   //   getAccounts() {
   //   return this.accounts;

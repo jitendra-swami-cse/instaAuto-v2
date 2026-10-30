@@ -10,11 +10,13 @@ class Browser {
     this.browser = null;
     this.page = null;
     this.profileTarget = null;
+    this.EnhancedPage = null;
   }
-
-  async initialize(profileTarget) {
+  initialize = async (profileTarget) => {
     try {
-      console.log(`Initializing browser for profile target: ${profileTarget}`);
+      AppLogger.logMSG(
+        `Initializing browser for profile target: ${profileTarget}`,
+      );
 
       this.profileTarget = profileTarget;
 
@@ -37,25 +39,25 @@ class Browser {
       //   },
       //   this.page,
       // );
-      await EnhancedPage.attachPage(this.page);
+      this.EnhancedPage = await EnhancedPage.attachPage(this.page);
 
       // Set permissions
       // const context = this.browser.defaultBrowserContext();
       // await context.overridePermissions("https://www.youtube.com/", []);
       // Check Developer Helper.md have the reason why above 3 lines are commented as flag ---deny-permission-prompts added in getBrowser.js .
-      console.log(
+      AppLogger.logMSG(
         `Browser initialized successfully for profile: ${profileTarget}`,
       );
       return true;
     } catch (error) {
-      console.error("Failed to initialize browser:", error);
+      AppLogger.logMSG(`Failed to initialize browser: ${error}`);
       throw error;
     }
-  }
+  };
 
-  async reconnect() {
+  reconnect = async () => {
     try {
-      console.log("Reconnecting browser...");
+      AppLogger.logMSG("Reconnecting browser...");
 
       if (this.browser) {
         await this.close();
@@ -64,53 +66,53 @@ class Browser {
       await this.initialize(this.profileTarget);
       return true;
     } catch (error) {
-      console.error("Failed to reconnect browser:", error);
+      AppLogger.logMSG(`Failed to reconnect browser: ${error}`);
       throw error;
     }
-  }
+  };
 
-  async close() {
+  close = async () => {
     try {
       if (this.browser) {
         await this.browser.close();
-        console.log("Browser closed successfully");
+        AppLogger.logMSG("Browser closed successfully");
       }
       this.browser = null;
       this.page = null;
     } catch (error) {
-      console.error("Error closing browser:", error);
+      AppLogger.logMSG(`Error closing browser: ${error}`);
       throw error;
     }
-  }
+  };
   // Check if browser is ready
-  isReady() {
+  isReady = () => {
     return this.browser !== null && this.page !== null;
-  }
+  };
 
   // Get all open pages URLs (for debugging)
-  async getAllPagesUrls() {
+  getAllPagesUrls = async () => {
     if (!this.browser) return [];
     const pages = await this.browser.pages();
     return await Promise.all(pages.map((page) => page.url()));
-  }
+  };
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
 
-  async listAllPages() {
+  listAllPages = async () => {
     const pages = await this.browser.pages();
     for (const page of pages) {
-      console.log(`Page URL: ${page.url()}`);
+      AppLogger.logMSG(`Page URL: ${page.url()}`);
     }
-  }
+  };
 
   // -------- Move Given Below Methods to Enhanced Page class.
-  async getCurrentUrl() {
+  getCurrentUrl = async () => {
     if (!this.page) throw new Error("Browser not initialized");
     return await this.page.url();
-  }
+  };
 
   // Instagram specific navigation methods
-  async goToInstagramHome() {
+  goToInstagramHome = async () => {
     try {
       const currentUrl = await this.getCurrentUrl();
       if (
@@ -121,23 +123,23 @@ class Browser {
       } else {
         await this.navigateTo("https://www.instagram.com/");
       }
-      console.log("Navigated to Instagram home");
+      AppLogger.logMSG("Navigated to Instagram home");
     } catch (error) {
-      console.log(
+      AppLogger.logMSG(
         "Home button not available, navigating directly to home page",
       );
       await this.navigateTo("https://www.instagram.com/");
     }
-  }
+  };
 
-  async goToProfile(userName) {
+  goToProfile = async (userName) => {
     const profileUrl = `https://www.instagram.com/${userName}/`;
     await this.navigateTo(profileUrl);
-    console.log(`Navigated to profile: ${userName}`);
-  }
+    AppLogger.logMSG(`Navigated to profile: ${userName}`);
+  };
 
-  async searchUser(userName) {
-    console.log(`Searching for user: ${userName}`);
+  searchUser = async (userName) => {
+    AppLogger.logMSG(`Searching for user: ${userName}`);
 
     // Click search button
     await this.page.clickNotClickable('[aria-label="Search"]');
@@ -153,10 +155,10 @@ class Browser {
 
     // Click on the user
     await this.page.clickNotClickable(`span ::-p-text(${userName})`);
-    console.log(`Selected user: ${userName} from search results`);
-  }
+    AppLogger.logMSG(`Selected user: ${userName} from search results`);
+  };
 
-  async clickFollow() {
+  clickFollow = async () => {
     const followBtn = await this.page
       .locator(`button ::-p-text(Follow)`)
       .waitHandle();
@@ -177,7 +179,7 @@ class Browser {
     // Check current button text
     const buttonText = await this.page.getText(followBtn);
     if (buttonText === "Following") {
-      console.log("Already following this user");
+      AppLogger.logMSG("Already following this user");
       return { alreadyFollowing: true };
     }
 
@@ -195,7 +197,7 @@ class Browser {
     let attempts = 0;
     while (attempts < 10) {
       if (await waitForFollow()) {
-        console.log("Follow action completed successfully");
+        AppLogger.logMSG("Follow action completed successfully");
         return { success: true };
       }
       await this.randomDelay(1, 0.5);
@@ -203,9 +205,9 @@ class Browser {
     }
 
     throw new Error("Follow action did not complete within expected time");
-  }
+  };
 
-  async likePost(postElement) {
+  likePost = async (postElement) => {
     // Scroll post into view
     await this.page.evaluate(
       (element) =>
@@ -234,25 +236,25 @@ class Browser {
 
     if (ariaLabel === "Like") {
       await this.page.clickNotClickable(likeButton);
-      console.log("Post liked successfully");
+      AppLogger.logMSG("Post liked successfully");
       return { liked: true };
     } else {
-      console.log("Post already liked");
+      AppLogger.logMSG("Post already liked");
       return { alreadyLiked: true };
     }
-  }
+  };
 
-  async getPostElements(userName) {
+  getPostElements = async (userName) => {
     const selector = `a[href^="/${userName}/reel/"], a[href^="/${userName}/p/"]`;
     return await this.page.$$(selector);
-  }
+  };
 
   // Utility method for random delays
-  async randomDelay(maxSeconds, minSeconds = 0) {
+  randomDelay = async (maxSeconds, minSeconds = 0) => {
     const delay =
       (Math.random() * (maxSeconds - minSeconds) + minSeconds) * 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
-  }
+  };
 }
 
 module.exports = new Browser();

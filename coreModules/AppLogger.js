@@ -23,7 +23,7 @@ async function createLogFile() {
     // Ensure the directory structure exists
     await fs.ensureDir(logsDir);
 
-    const initialContent = `======= Instagram Automation Started (New Architecture) =======\n-=-=-=-=-=-= This Log Created on ${getFormattedTimestamp()} =-=-=-=-=-=-\n`;
+    const initialContent = `======= Browser Automation Started (New Architecture) =======\n-=-=-=-=-=-= This Log Created on ${getFormattedTimestamp()} =-=-=-=-=-=-\n`;
 
     // 2. 'wx' flag fails if the file already exists, protecting existing data
     await fs.writeFile(logFilePath, initialContent, { flag: "wx" });
@@ -45,51 +45,52 @@ class Applogger {
     this.startTime = Date.now();
   }
 
-  async init() {
+  init = async () => {
     this.logFilePath = await createLogFile();
-  }
+  };
 
-  async logMSG(message) {
+  logMSG = async (message, consoleLog = true) => {
     if (!this.logFilePath) {
       console.log("Log File not exists so first creating Log File");
       this.logFilePath = await this.init();
     }
     fs.appendFileSync(this.logFilePath, `${message}\n`);
-  }
+    if (consoleLog) console.log(message);
+  };
 
-  async logLineBreak() {
+  logLineBreak = async () => {
     let lineBreak = `===================================================================================`;
     await this.logMSG(lineBreak);
-  }
+  };
 
-  async logError(message, error) {
+  logError = async (message, error) => {
     const errorMessage = `${message}\nError: ${error?.message}\n`;
     await this.logMSG(errorMessage);
-  }
+  };
 
-  async logTask() {
+  logTask = async () => {
     await this.logMSG(JSON.stringify(this.task, null, 2) + "\n\n");
     await this.logLineBreak();
-  }
+  };
 
-  async logAction() {
+  logAction = async () => {
     await this.logMSG(JSON.stringify(this.currentAction, null, 2) + "\n\n");
     await this.appLogger.logLineBreak();
-  }
+  };
 
-  async logState() {
+  logState = async () => {
     await this.logMSG(JSON.stringify(this.state, null, 2) + "\n\n");
     await this.logLineBreak();
-  }
+  };
 
-  async getExecutionTime() {
+  getExecutionTime = async () => {
     const totalSeconds = Math.floor((Date.now() - this.startTime) / 1000);
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${String(minutes).padStart(2, "0")} minutes & ${String(seconds).padStart(2, "0")} seconds`;
-  }
+  };
 
-  async logTaskResult(status = "success") {
+  logTaskResult = async (status = "success") => {
     const executionTime = await this.getExecutionTime();
     let resultMessage = "";
 
@@ -105,7 +106,7 @@ class Applogger {
     }
 
     this.logMSG(`\n${resultMessage}\n`);
-  }
+  };
 }
 
 module.exports = new Applogger();
