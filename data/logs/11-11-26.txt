@@ -37,3 +37,61 @@ InstaScraper initialized for profile: 2
 Initializing browser for profile target: 2
 Browser initialized successfully for profile: undefined
 InstaScraper initialized for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: jitendra_goswami132
+Failed to navigate to profile jitendra_goswami132:
+Error: Cannot read properties of undefined (reading 'navigateTo')
+
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: jitendra_goswami132
+Failed to navigate to profile jitendra_goswami132:
+Error: Cannot read properties of undefined (reading 'navigateTo')
+
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: null
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/eopwejdkla/
+Page.navigateTo(https://www.instagram.com/eopwejdkla/) called.
+Completed Navigation to https://www.instagram.com/eopwejdkla
+Failed to navigate to profile eopwejdkla:
+Error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'h2:contains("Sorry, this page isn't available.")' is not a valid selector.
+
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/eopwejdkla/
+Page.navigateTo(https://www.instagram.com/eopwejdkla/) called.
+Already on https://www.instagram.com/eopwejdkla/.
+Failed to navigate to profile eopwejdkla:
+Error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'span:contains("Sorry, this page isn't available.")' is not a valid selector.
+

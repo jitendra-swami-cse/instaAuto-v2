@@ -9,7 +9,9 @@ class Instagram {
   }
 
   init = async (profile) => {
-    if (Browser.browser === null) await Browser.initialize(profile?.profileTarget);
+    if (!Browser.browser) await Browser.initialize(profile?.profileTarget);
+    if (!Browser.EnhancedPage) Browser.EnhancedPage = await EnhancedPage.attachPage(Browser.page);
+
     await AppLogger.logMSG(`InstaScraper initialized for profile: ${Browser.profileTarget}`);
   };
 
@@ -18,19 +20,18 @@ class Instagram {
    * @param {Object} page - Puppeteer page instance
    * @param {string} username - Target username
    */
-  navigateToProfile = async (page, username) => {
-    const page = page || Browser.EnhancedPage;
-
-    const url = `https://www.instagram.com/${username}/`;
-
+  navigateToProfile = async (username) => {
     try {
-      AppLogger.logMSG(`Navigating to profile: ${username}`);
-      // await page.navigateTo(url, { waitUntil: "networkidle2" });
-      await page.navigateTo(url);
+      const url = `https://www.instagram.com/${username}/`;
+      AppLogger.logMSG(`Navigating to profile: ${url}`);
+      await Browser.EnhancedPage.navigateTo(url);
 
       // Check if profile exists
-      const notFound = await page.$('h2:contains("Sorry, this page isn\'t available.")');
+      // Ask chat GPT to check that some time ago the selector 'h2:contains("Sorry, this page isn\'t available.")' was working but not now and the error is -> Error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'span:contains("Sorry, this page isn't available.")' is not a valid selector.
+      // const notFound = await Browser.page.$('h2:contains("Sorry, this page isn\'t available.")');
+      const notFound = await Browser.page.$('span:contains("Sorry, this page isn\'t available.")');
       if (notFound) {
+        AppLogger.logMSG(`Profile ${username} not found`);
         throw new Error(`Profile ${username} not found`);
       }
 

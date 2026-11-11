@@ -52,6 +52,7 @@ class EnhancedPage {
 
   attachPage = async (page) => {
     this.page = page;
+    return this; // Return the instance for chaining
   };
 
   waitForPageLoad = async (timeout = 120000) => {
@@ -80,9 +81,7 @@ class EnhancedPage {
       });
       AppLogger.logMSG(`Completed Navigation to ${currentURL}`);
     } catch (error) {
-      AppLogger.logMSG(
-        `Error in Page.navigateTo(${url}) is as: ${error.message}`,
-      );
+      AppLogger.logMSG(`Error in Page.navigateTo(${url}) is as: ${error.message}`);
     }
   };
 
@@ -107,8 +106,7 @@ class EnhancedPage {
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
   waitForElementRobust = async (textOrSelector, text = false) => {
     // text = false;
-    let selectorString =
-      text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
+    let selectorString = text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
     AppLogger.logMSG(`selectorString: ${selectorString}`);
 
     const element = await this.page.locator(selectorString).waitHandle();
@@ -138,10 +136,7 @@ class EnhancedPage {
 
     // Arrow function captures `this` and outer variables automatically
     const waitSearchnClick = async () => {
-      const element =
-        typeof textOrSelectorOrElement === "string"
-          ? await this.waitForElementRobust(textOrSelectorOrElement, text)
-          : textOrSelectorOrElement;
+      const element = typeof textOrSelectorOrElement === "string" ? await this.waitForElementRobust(textOrSelectorOrElement, text) : textOrSelectorOrElement;
 
       if (!element) {
         throw new Error(`Element not found: ${textOrSelectorOrElement}`);
@@ -149,9 +144,7 @@ class EnhancedPage {
 
       const boundingBox = await element.boundingBox();
       if (!boundingBox) {
-        throw new Error(
-          `Bounding Box not found for: ${textOrSelectorOrElement}`,
-        );
+        throw new Error(`Bounding Box not found for: ${textOrSelectorOrElement}`);
       }
 
       const { x, y, width, height } = boundingBox;
@@ -197,17 +190,11 @@ class EnhancedPage {
 
     // Clear the input field
     await inputField.evaluate((el) => (el.value = ""));
-    AppLogger.logMSG(
-      `----- stringToType: ${stringToType} ---causing the error --`,
-    );
+    AppLogger.logMSG(`----- stringToType: ${stringToType} ---causing the error --`);
 
     for (let char of stringToType) {
       // Simulate typing delay
-      const delay =
-        Math.floor(
-          Math.random() *
-            (options.maximumDelayInMs - options.minimumDelayInMs + 1),
-        ) + options.minimumDelayInMs;
+      const delay = Math.floor(Math.random() * (options.maximumDelayInMs - options.minimumDelayInMs + 1)) + options.minimumDelayInMs;
 
       // Introduce a typo based on the typo chance
       let typedChar = char;
@@ -226,12 +213,7 @@ class EnhancedPage {
 
           // Simulate backspacing to remove the typo
           const backspaceDelay =
-            Math.floor(
-              Math.random() *
-                (options.backspaceMaximumDelayInMs -
-                  options.backspaceMinimumDelayInMs +
-                  1),
-            ) + options.backspaceMinimumDelayInMs;
+            Math.floor(Math.random() * (options.backspaceMaximumDelayInMs - options.backspaceMinimumDelayInMs + 1)) + options.backspaceMinimumDelayInMs;
           await utils.delay(backspaceDelay);
 
           // Type backspace to remove the last character (the typo)
@@ -251,9 +233,7 @@ class EnhancedPage {
   // ========== 👆 Above Code is Checked not tested 👆 ==========
   checkVisibilityBeforeClick = async (selector) => {
     return await this.page.evaluate((selector) => {
-      const subBTN = Array.from(document.querySelectorAll(selector)).find(
-        (el) => el.checkVisibility(),
-      );
+      const subBTN = Array.from(document.querySelectorAll(selector)).find((el) => el.checkVisibility());
       // subBTN.click();
       // return subBTN.textContent;
       return subBTN;
@@ -273,12 +253,7 @@ class EnhancedPage {
    * @param {number} timeoutMs - The timeout in milliseconds after which the method will return false. Default is 30000.
    * @returns {(string | false)} The new URL if the URL changed, false otherwise.
    */
-  waitForURLChange = async (
-    beforePageURL,
-    maxAttempts = 5,
-    delayMs = 3000,
-    timeoutMs = 30000,
-  ) => {
+  waitForURLChange = async (beforePageURL, maxAttempts = 5, delayMs = 3000, timeoutMs = 30000) => {
     let flag;
     try {
       flag = await utils.robustPolling(
@@ -287,9 +262,7 @@ class EnhancedPage {
             await this.waitForPageLoad();
             return this.page.url();
           }
-          throw new Error(
-            `URL has not changed yet. Still on: ${beforePageURL}`,
-          );
+          throw new Error(`URL has not changed yet. Still on: ${beforePageURL}`);
         },
         {
           maxAttempts,
@@ -328,22 +301,13 @@ class EnhancedPage {
   };
 
   getAllElementIds = async (unique = false) => {
-    const isUnique =
-      typeof unique === "object" && unique !== null
-        ? Boolean(unique.unique)
-        : Boolean(unique);
+    const isUnique = typeof unique === "object" && unique !== null ? Boolean(unique.unique) : Boolean(unique);
 
     return await this.page.evaluate((isUnique) => {
-      const ids = Array.from(
-        document.querySelectorAll("[id]"),
-        (el) => el.id,
-      ).filter(Boolean);
+      const ids = Array.from(document.querySelectorAll("[id]"), (el) => el.id).filter(Boolean);
       if (!isUnique) return ids;
 
-      const counts = ids.reduce(
-        (acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc),
-        {},
-      );
+      const counts = ids.reduce((acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc), {});
       return ids.filter((id) => counts[id] === 1);
     }, isUnique);
   };
@@ -416,9 +380,7 @@ class EnhancedPage {
         if (!parent || parent === document.body) {
           return el.tagName.toLowerCase();
         }
-        const siblings = Array.from(parent.children).filter(
-          (c) => c.tagName === el.tagName,
-        );
+        const siblings = Array.from(parent.children).filter((c) => c.tagName === el.tagName);
         const index = siblings.indexOf(el) + 1;
         const parentPrefix = parent.id ? `#${CSS.escape(parent.id)} > ` : "";
         return `${parentPrefix}${el.tagName.toLowerCase()}:nth-of-type(${index})`;
@@ -438,10 +400,7 @@ class EnhancedPage {
           .join(" ");
 
         if (directText.length > 0) {
-          const openingTag = el.outerHTML.slice(
-            0,
-            el.outerHTML.indexOf(">") + 1,
-          );
+          const openingTag = el.outerHTML.slice(0, el.outerHTML.indexOf(">") + 1);
 
           result.push({
             tagName: el.tagName.toLowerCase(),

@@ -3,6 +3,7 @@ const AppLogger = require("./coreModules/AppLogger");
 const Browser = require("./coreModules/Browser");
 const EnhancedPage = require("./coreModules/EnhancedPage");
 const InstaScraper = require("./instaModules/InstaScraper");
+const Instagram = require("./instaModules/Instagram.js");
 
 async function main() {
   console.log("Starting.....");
@@ -12,7 +13,9 @@ async function main() {
   await AppLogger.init();
 
   // =========== Code under testing and Development ==============
-  await InstaScraper.init();
+  await Instagram.init();
+  await Instagram.navigateToProfile("eopwejdkla");
+  // await Instagram.navigateToProfile("jitendra_goswami132");
   console.log("Browser Config: ", ConfigManager.browserConfig);
   console.log("let's Check All Elements");
 
