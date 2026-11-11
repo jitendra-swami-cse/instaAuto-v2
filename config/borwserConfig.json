@@ -1,4 +1,5 @@
 {
   "chromeExecutablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "profileTarget": 2,
   "headless": false
 }

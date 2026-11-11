@@ -1,0 +1,39 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 11-11-26 12-06-28 =-=-=-=-=-=-
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Error in Page.navigateTo(https://www.youtube.com/) is as: Protocol error (Page.navigate): Target closed
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Already on https://www.youtube.com/.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Completed Navigation to chrome://new-tab-page/
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Page.navigateTo(https://www.youtube.com/) called.
+Already on https://www.youtube.com/.
+Initializing browser for profile target: 2
+Initializing browser for profile target: undefined
+Initializing browser for profile target: undefined
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: undefined
+Initializing browser for profile target: undefined
+Initializing browser for profile target: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2

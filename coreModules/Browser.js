@@ -14,14 +14,11 @@ class Browser {
   }
   initialize = async (profileTarget) => {
     try {
-      AppLogger.logMSG(
-        `Initializing browser for profile target: ${profileTarget}`,
-      );
-
-      this.profileTarget = profileTarget;
+      this.profileTarget = profileTarget || ConfigManager.browserConfig.profileTarget;
+      AppLogger.logMSG(`Initializing browser for profile target: ${this.profileTarget}`);
 
       const browserOptions = {
-        profileTarget: profileTarget,
+        profileTarget: this.profileTarget,
         headless: ConfigManager.browserConfig.headless || false,
       };
 
@@ -45,9 +42,7 @@ class Browser {
       // const context = this.browser.defaultBrowserContext();
       // await context.overridePermissions("https://www.youtube.com/", []);
       // Check Developer Helper.md have the reason why above 3 lines are commented as flag ---deny-permission-prompts added in getBrowser.js .
-      AppLogger.logMSG(
-        `Browser initialized successfully for profile: ${profileTarget}`,
-      );
+      AppLogger.logMSG(`Browser initialized successfully for profile: ${profileTarget}`);
       return true;
     } catch (error) {
       AppLogger.logMSG(`Failed to initialize browser: ${error}`);
@@ -115,19 +110,14 @@ class Browser {
   goToInstagramHome = async () => {
     try {
       const currentUrl = await this.getCurrentUrl();
-      if (
-        currentUrl.includes("https://www.instagram.com") &&
-        !currentUrl.includes("graphql")
-      ) {
+      if (currentUrl.includes("https://www.instagram.com") && !currentUrl.includes("graphql")) {
         await this.page.clickNotClickable(`[aria-label="Home"]`);
       } else {
         await this.navigateTo("https://www.instagram.com/");
       }
       AppLogger.logMSG("Navigated to Instagram home");
     } catch (error) {
-      AppLogger.logMSG(
-        "Home button not available, navigating directly to home page",
-      );
+      AppLogger.logMSG("Home button not available, navigating directly to home page");
       await this.navigateTo("https://www.instagram.com/");
     }
   };
@@ -159,9 +149,7 @@ class Browser {
   };
 
   clickFollow = async () => {
-    const followBtn = await this.page
-      .locator(`button ::-p-text(Follow)`)
-      .waitHandle();
+    const followBtn = await this.page.locator(`button ::-p-text(Follow)`).waitHandle();
 
     // Scroll button into view
     await this.page.evaluate(
@@ -226,13 +214,8 @@ class Browser {
     await this.randomDelay(1, 0.5);
 
     // Find and click like button
-    const likeButton = await this.page
-      .locator(`[aria-label$="ike"][height="24"][width="24"]`)
-      .waitHandle();
-    const ariaLabel = await this.page.evaluate(
-      (element) => element.ariaLabel,
-      likeButton,
-    );
+    const likeButton = await this.page.locator(`[aria-label$="ike"][height="24"][width="24"]`).waitHandle();
+    const ariaLabel = await this.page.evaluate((element) => element.ariaLabel, likeButton);
 
     if (ariaLabel === "Like") {
       await this.page.clickNotClickable(likeButton);
@@ -251,8 +234,7 @@ class Browser {
 
   // Utility method for random delays
   randomDelay = async (maxSeconds, minSeconds = 0) => {
-    const delay =
-      (Math.random() * (maxSeconds - minSeconds) + minSeconds) * 1000;
+    const delay = (Math.random() * (maxSeconds - minSeconds) + minSeconds) * 1000;
     await new Promise((resolve) => setTimeout(resolve, delay));
   };
 }
