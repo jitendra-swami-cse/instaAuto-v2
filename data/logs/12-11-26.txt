@@ -1,0 +1,23 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 12-11-26 01-00-38 =-=-=-=-=-=-
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+selectorString: span[aria-label="Close"]
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+selectorString: svg[aria-label="Close"]
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+selectorString: svg[aria-label="Close"]

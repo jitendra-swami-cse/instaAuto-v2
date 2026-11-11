@@ -86,10 +86,11 @@ async function openChromeInstance(profileTarget, windowSize, windowPosition) {
     `In openChromeInstance function, Profile to be opened has target: ${profileTarget}`,
   );
 
-  const chromePath = `C:/Program Files/Google/Chrome/Application/chrome.exe`;
-
   // On Store Keeper's PC
-  // const chromePath = `C:/Program Files (x86)/Google/Chrome/Application/chrome.exe`;
+  // const chromePath = `C:/Program Files/Google/Chrome/Application/chrome.exe`;
+
+  // On JN's Laptop
+  const chromePath = `C:/Users/Jitendra/AppData/Local/Google/Chrome/Application/chrome.exe`;
 
   // for older chrome v135 and below
   // Example openCommand = `"C:\Program Files\Google\Chrome\Application\chrome.exe"  --user-data-dir="C:\Automation-App-by-JN-Data" --profile-directory="Profile 10" --remote-debugging-port=9222 --window-size=814,859 --window-position=793,0`;

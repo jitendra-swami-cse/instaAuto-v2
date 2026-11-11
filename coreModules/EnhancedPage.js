@@ -81,9 +81,171 @@ class EnhancedPage {
       });
       AppLogger.logMSG(`Completed Navigation to ${currentURL}`);
     } catch (error) {
-      AppLogger.logMSG(`Error in Page.navigateTo(${url}) is as: ${error.message}`);
+      AppLogger.logMSG(
+        `Error in Page.navigateTo(${url}) is as: ${error.message}`,
+      );
     }
   };
+
+  // /**
+  //  * Waits for one of several possible page states.
+  //  *
+  //  * Selectors are ordered by priority. Put modal/error selectors
+  //  * before underlying page selectors.
+  //  *
+  //  * @param {string[]} selectorsArray
+  //  * @param {Object} options
+  //  * @param {number} options.timeout
+  //  * @param {number} options.pageLoadTimeout
+  //  * @param {number} options.quietPeriod
+  //  * @param {number} options.maxSettleTime
+  //  * @param {boolean} options.visibleOnly
+  //  * @param {boolean} options.returnNullOnTimeout
+  //  *
+  //  * @returns {Promise<string|null>}
+  //  */
+  // waitForAnySelector = async (
+  //   selectorsArray,
+  //   {
+  //     timeout = 60000,
+  //     pageLoadTimeout = 120000,
+  //     quietPeriod = 1000,
+  //     maxSettleTime = 5000,
+  //     visibleOnly = true,
+  //     returnNullOnTimeout = false,
+  //   } = {},
+  // ) => {
+  //   if (!this.page) {
+  //     throw new Error("Page instance is required.");
+  //   }
+
+  //   if (
+  //     !Array.isArray(selectorsArray) ||
+  //     !selectorsArray.length ||
+  //     !selectorsArray.every(
+  //       (selector) => typeof selector === "string" && selector.trim(),
+  //     )
+  //   ) {
+  //     throw new TypeError("A non-empty array of CSS selectors is required.");
+  //   }
+
+  //   const selectors = [
+  //     ...new Set(selectorsArray.map((selector) => selector.trim())),
+  //   ];
+
+  //   try {
+  //     // First wait for the current document to finish loading.
+  //     await this.waitForPageLoad(pageLoadTimeout);
+
+  //     // Then wait for a matching selector and DOM stability.
+  //     return await this.page.evaluate(
+  //       ({ selectors, timeout, quietPeriod, maxSettleTime, visibleOnly }) => {
+  //         return new Promise((resolve, reject) => {
+  //           let quietTimer;
+  //           let maxTimer;
+  //           let resolved = false;
+  //           let observer;
+
+  //           const startTime = Date.now();
+
+  //           const isVisible = (element) => {
+  //             if (!visibleOnly) return true;
+
+  //             const style = getComputedStyle(element);
+
+  //             return (
+  //               element.getClientRects().length > 0 &&
+  //               style.display !== "none" &&
+  //               style.visibility !== "hidden" &&
+  //               style.opacity !== "0"
+  //             );
+  //           };
+
+  //           const getMatchingSelector = () => {
+  //             for (const selector of selectors) {
+  //               const elements = document.querySelectorAll(selector);
+
+  //               if ([...elements].some(isVisible)) {
+  //                 return selector;
+  //               }
+  //             }
+
+  //             return null;
+  //           };
+
+  //           const cleanup = () => {
+  //             clearTimeout(quietTimer);
+  //             clearTimeout(maxTimer);
+  //             observer?.disconnect();
+  //           };
+
+  //           const finish = (selector) => {
+  //             if (resolved) return;
+
+  //             resolved = true;
+  //             cleanup();
+  //             resolve(selector);
+  //           };
+
+  //           const check = () => {
+  //             const selector = getMatchingSelector();
+
+  //             if (!selector) {
+  //               clearTimeout(quietTimer);
+  //               return;
+  //             }
+
+  //             clearTimeout(quietTimer);
+
+  //             quietTimer = setTimeout(() => {
+  //               finish(getMatchingSelector());
+  //             }, quietPeriod);
+  //           };
+
+  //           // Observe DOM changes before checking existing selectors.
+  //           observer = new MutationObserver(check);
+
+  //           observer.observe(document.documentElement, {
+  //             childList: true,
+  //             subtree: true,
+  //             attributes: true,
+  //           });
+
+  //           // Handle selectors that already exist.
+  //           check();
+
+  //           // Maximum time allowed for DOM stabilization.
+  //           maxTimer = setTimeout(() => {
+  //             finish(getMatchingSelector());
+  //           }, maxSettleTime);
+
+  //           // Overall timeout.
+  //           setTimeout(() => {
+  //             if (resolved) return;
+
+  //             cleanup();
+  //             reject(
+  //               new Error(`No matching selector found within ${timeout}ms.`),
+  //             );
+  //           }, timeout);
+  //         });
+  //       },
+  //       {
+  //         selectors,
+  //         timeout,
+  //         quietPeriod,
+  //         maxSettleTime,
+  //         visibleOnly,
+  //       },
+  //     );
+  //   } catch (error) {
+  //     if (returnNullOnTimeout && error.message.includes("within")) {
+  //       return null;
+  //     }
+
+  //     throw error;
+  //   }
+  // };
 
   goBackToPreviousPage = async () => {
     try {
@@ -106,7 +268,8 @@ class EnhancedPage {
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
   waitForElementRobust = async (textOrSelector, text = false) => {
     // text = false;
-    let selectorString = text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
+    let selectorString =
+      text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
     AppLogger.logMSG(`selectorString: ${selectorString}`);
 
     const element = await this.page.locator(selectorString).waitHandle();
@@ -136,7 +299,10 @@ class EnhancedPage {
 
     // Arrow function captures `this` and outer variables automatically
     const waitSearchnClick = async () => {
-      const element = typeof textOrSelectorOrElement === "string" ? await this.waitForElementRobust(textOrSelectorOrElement, text) : textOrSelectorOrElement;
+      const element =
+        typeof textOrSelectorOrElement === "string"
+          ? await this.waitForElementRobust(textOrSelectorOrElement, text)
+          : textOrSelectorOrElement;
 
       if (!element) {
         throw new Error(`Element not found: ${textOrSelectorOrElement}`);
@@ -144,7 +310,9 @@ class EnhancedPage {
 
       const boundingBox = await element.boundingBox();
       if (!boundingBox) {
-        throw new Error(`Bounding Box not found for: ${textOrSelectorOrElement}`);
+        throw new Error(
+          `Bounding Box not found for: ${textOrSelectorOrElement}`,
+        );
       }
 
       const { x, y, width, height } = boundingBox;
@@ -190,11 +358,17 @@ class EnhancedPage {
 
     // Clear the input field
     await inputField.evaluate((el) => (el.value = ""));
-    AppLogger.logMSG(`----- stringToType: ${stringToType} ---causing the error --`);
+    AppLogger.logMSG(
+      `----- stringToType: ${stringToType} ---causing the error --`,
+    );
 
     for (let char of stringToType) {
       // Simulate typing delay
-      const delay = Math.floor(Math.random() * (options.maximumDelayInMs - options.minimumDelayInMs + 1)) + options.minimumDelayInMs;
+      const delay =
+        Math.floor(
+          Math.random() *
+            (options.maximumDelayInMs - options.minimumDelayInMs + 1),
+        ) + options.minimumDelayInMs;
 
       // Introduce a typo based on the typo chance
       let typedChar = char;
@@ -213,7 +387,12 @@ class EnhancedPage {
 
           // Simulate backspacing to remove the typo
           const backspaceDelay =
-            Math.floor(Math.random() * (options.backspaceMaximumDelayInMs - options.backspaceMinimumDelayInMs + 1)) + options.backspaceMinimumDelayInMs;
+            Math.floor(
+              Math.random() *
+                (options.backspaceMaximumDelayInMs -
+                  options.backspaceMinimumDelayInMs +
+                  1),
+            ) + options.backspaceMinimumDelayInMs;
           await utils.delay(backspaceDelay);
 
           // Type backspace to remove the last character (the typo)
@@ -233,7 +412,9 @@ class EnhancedPage {
   // ========== 👆 Above Code is Checked not tested 👆 ==========
   checkVisibilityBeforeClick = async (selector) => {
     return await this.page.evaluate((selector) => {
-      const subBTN = Array.from(document.querySelectorAll(selector)).find((el) => el.checkVisibility());
+      const subBTN = Array.from(document.querySelectorAll(selector)).find(
+        (el) => el.checkVisibility(),
+      );
       // subBTN.click();
       // return subBTN.textContent;
       return subBTN;
@@ -253,7 +434,12 @@ class EnhancedPage {
    * @param {number} timeoutMs - The timeout in milliseconds after which the method will return false. Default is 30000.
    * @returns {(string | false)} The new URL if the URL changed, false otherwise.
    */
-  waitForURLChange = async (beforePageURL, maxAttempts = 5, delayMs = 3000, timeoutMs = 30000) => {
+  waitForURLChange = async (
+    beforePageURL,
+    maxAttempts = 5,
+    delayMs = 3000,
+    timeoutMs = 30000,
+  ) => {
     let flag;
     try {
       flag = await utils.robustPolling(
@@ -262,7 +448,9 @@ class EnhancedPage {
             await this.waitForPageLoad();
             return this.page.url();
           }
-          throw new Error(`URL has not changed yet. Still on: ${beforePageURL}`);
+          throw new Error(
+            `URL has not changed yet. Still on: ${beforePageURL}`,
+          );
         },
         {
           maxAttempts,
@@ -284,6 +472,29 @@ class EnhancedPage {
   };
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
+  pageHasText = async (text, selectorsArray) => {
+    if (typeof text !== "string" || !text.trim()) {
+      throw new TypeError("pageHasText() requires a non-empty text string.");
+    }
+
+    return this.page.evaluate(
+      ({ text, selectorsArray }) => {
+        const searchText = text.trim().toLowerCase();
+
+        // No selectors supplied: search the entire document.
+        const elements = selectorsArray?.length
+          ? selectorsArray.flatMap((selector) => [
+              ...document.querySelectorAll(selector),
+            ])
+          : [document.body];
+
+        return elements.some((element) =>
+          element.textContent?.toLowerCase().includes(searchText),
+        );
+      },
+      { text, selectorsArray },
+    );
+  };
 
   listAllFrames = async () => {
     const frames = this.page.frames();
@@ -301,13 +512,22 @@ class EnhancedPage {
   };
 
   getAllElementIds = async (unique = false) => {
-    const isUnique = typeof unique === "object" && unique !== null ? Boolean(unique.unique) : Boolean(unique);
+    const isUnique =
+      typeof unique === "object" && unique !== null
+        ? Boolean(unique.unique)
+        : Boolean(unique);
 
     return await this.page.evaluate((isUnique) => {
-      const ids = Array.from(document.querySelectorAll("[id]"), (el) => el.id).filter(Boolean);
+      const ids = Array.from(
+        document.querySelectorAll("[id]"),
+        (el) => el.id,
+      ).filter(Boolean);
       if (!isUnique) return ids;
 
-      const counts = ids.reduce((acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc), {});
+      const counts = ids.reduce(
+        (acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc),
+        {},
+      );
       return ids.filter((id) => counts[id] === 1);
     }, isUnique);
   };
@@ -380,7 +600,9 @@ class EnhancedPage {
         if (!parent || parent === document.body) {
           return el.tagName.toLowerCase();
         }
-        const siblings = Array.from(parent.children).filter((c) => c.tagName === el.tagName);
+        const siblings = Array.from(parent.children).filter(
+          (c) => c.tagName === el.tagName,
+        );
         const index = siblings.indexOf(el) + 1;
         const parentPrefix = parent.id ? `#${CSS.escape(parent.id)} > ` : "";
         return `${parentPrefix}${el.tagName.toLowerCase()}:nth-of-type(${index})`;
@@ -400,7 +622,10 @@ class EnhancedPage {
           .join(" ");
 
         if (directText.length > 0) {
-          const openingTag = el.outerHTML.slice(0, el.outerHTML.indexOf(">") + 1);
+          const openingTag = el.outerHTML.slice(
+            0,
+            el.outerHTML.indexOf(">") + 1,
+          );
 
           result.push({
             tagName: el.tagName.toLowerCase(),
@@ -693,3 +918,11 @@ const interceptRequests = async function (options, filterFn, handlerFn) {
 // };
 // === Interface ===
 // module.exports = catchAsync(hookMethodsOnPage);
+
+// OK the code given below is my EnhancedPage class code please analyze it and
+// give me a most optimized  method code for usecase/condition like some time web page dynamically redirected to one of some urls or
+//  like when i go to url either a page with overlay of modal window with selector1 appears or the original page without modal appears
+//  Like when i click on a button it may redirect to page1 with selectorPage1 or page2 with selectorPage2 or page3 with selectorPage3 or page4 with selectorPage4
+// how i can handle this situation in a single method of EnhancedPage class which will wait for page load and then check for the presence of any of the selectors and return the selector which is present on the page.
+// You can create a method in the `EnhancedPage` class that waits for the page to load and then checks for the presence of
+// multiple selectors. This method will return the first selector that is found on the page. :

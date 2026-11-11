@@ -174,3 +174,89 @@ class EnhancedPage {
 let el = [...document.querySelectorAll('*')].find(el => el.textContent.trim() === 'Create')
 let el2 = [...document.querySelectorAll('*')].filter(el => el.textContent.trim() === 'Create')
 let el3 = Array.from(document.querySelectorAll('\*')).filter(el => Array.from(el.childNodes).some(node => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() === 'Create'));
+
+<!-- -=-=-=-=-=-=-=--=-=-==-=-=-=-=- -->
+
+The best approach is to use `page.evaluate()` with native DOM APIs, rather than XPath.
+
+XPath is useful for locating elements by text, but `querySelectorAll()` is simpler and generally more efficient when you already have CSS selectors. We can combine both requirements in one reusable function:
+
+- `pageHasText(text, selectorsArray)` — searches only inside the specified selectors.
+- `pageHasText(text)` — searches the entire page.
+- Returns `true` if the text is found; otherwise `false`.
+- Uses case-insensitive matching by default.
+- Handles multiple selectors and avoids invalid CSS such as `:contains()`.
+
+### Recommended implementation
+
+Add this method to your `EnhancedPage` class:
+
+```
+async pageHasText(text, selectorsArray) {
+  if (typeof text !== "string" || !text.trim()) {
+    throw new TypeError("pageHasText() requires a non-empty text string.");
+  }
+
+  return this.page.evaluate(({ text, selectorsArray }) => {
+    const searchText = text.trim().toLowerCase();
+
+    // No selectors supplied: search the entire document.
+    const elements = selectorsArray?.length
+      ? selectorsArray.flatMap((selector) => [
+          ...document.querySelectorAll(selector),
+        ])
+      : [document.body];
+
+    return elements.some((element) =>
+      element.textContent?.toLowerCase().includes(searchText)
+    );
+  }, { text, selectorsArray });
+}
+```
+
+### Usage
+
+1\. Search the entire page
+
+```
+const notFound = await Browser.pageHasText(
+  "Sorry, this page isn't available."
+);
+```
+
+2\. Search within specific elements
+
+```
+const notFound = await Browser.pageHasText(
+  "Sorry, this page isn't available.",
+  ["h2", "span", "div"]
+);
+```
+
+3\. Search within multiple targeted selectors
+
+```
+const errorFound = await Browser.pageHasText(
+  "Something went wrong",
+  [
+    '[role="alert"]',
+    '[role="dialog"]',
+    ".error-message",
+  ]
+);
+```
+
+### Why I recommend this over XPath
+
+| Approach                   | Assessment                                                                 |
+| -------------------------- | -------------------------------------------------------------------------- |
+| XPath                      | Good for complex DOM relationships and text-based element selection        |
+| CSS + `querySelectorAll()` | Best fit for your use case; straightforward and efficient                  |
+| `document.body.innerText`  | Simple whole-page search, but reads rendered text rather than all DOM text |
+| `textContent`              | Searches DOM text, including hidden elements                               |
+
+One important distinction: This implementation searches `textContent`, so it can find text in hidden elements too. If you only want text visible to the user, replace `element.textContent` with `element.innerText`.
+
+My recommendation is to keep `textContent` as the default for Instagram page-state detection. It is more useful when the platform renders messages in elements that are not immediately visible.
+
+One further improvement worth considering later is an optional `timeout` parameter, allowing `pageHasText()` to wait for dynamically rendered messages instead of checking only once.

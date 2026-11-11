@@ -13,11 +13,9 @@ async function main() {
   await AppLogger.init();
 
   // =========== Code under testing and Development ==============
+  // await Browser.initialize(2);
   await Instagram.init();
-  await Instagram.navigateToProfile("eopwejdkla");
-  // await Instagram.navigateToProfile("jitendra_goswami132");
-  console.log("Browser Config: ", ConfigManager.browserConfig);
-  console.log("let's Check All Elements");
+  await Instagram.navigateToProfile("Jitendra_goswami132");
 
   // =========================
   console.log("Ended........");

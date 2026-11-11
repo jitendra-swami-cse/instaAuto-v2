@@ -10,9 +10,12 @@ class Instagram {
 
   init = async (profile) => {
     if (!Browser.browser) await Browser.initialize(profile?.profileTarget);
-    if (!Browser.EnhancedPage) Browser.EnhancedPage = await EnhancedPage.attachPage(Browser.page);
+    if (!Browser.EnhancedPage)
+      Browser.EnhancedPage = await EnhancedPage.attachPage(Browser.page);
 
-    await AppLogger.logMSG(`InstaScraper initialized for profile: ${Browser.profileTarget}`);
+    await AppLogger.logMSG(
+      `InstaScraper initialized for profile: ${Browser.profileTarget}`,
+    );
   };
 
   /**
@@ -26,18 +29,32 @@ class Instagram {
       AppLogger.logMSG(`Navigating to profile: ${url}`);
       await Browser.EnhancedPage.navigateTo(url);
 
-      // Check if profile exists
-      // Ask chat GPT to check that some time ago the selector 'h2:contains("Sorry, this page isn\'t available.")' was working but not now and the error is -> Error: SyntaxError: Failed to execute 'querySelector' on 'Document': 'span:contains("Sorry, this page isn't available.")' is not a valid selector.
-      // const notFound = await Browser.page.$('h2:contains("Sorry, this page isn\'t available.")');
-      const notFound = await Browser.page.$('span:contains("Sorry, this page isn\'t available.")');
-      if (notFound) {
+      await Browser.EnhancedPage.waitForPageLoad();
+
+      const profileNotFound = await Browser.EnhancedPage.pageHasText(
+        // "Sorry, this page isn't available.",
+        "Profile isn't available",
+        ["span", "h2"],
+      );
+
+      if (profileNotFound) {
         AppLogger.logMSG(`Profile ${username} not found`);
         throw new Error(`Profile ${username} not found`);
       }
 
+      await Browser.EnhancedPage.clickNotClickable('svg[aria-label="Close"]');
+
+      // const loginModel = await Browser.EnhancedPage.waitForElement(
+      //   '[role="dialog"] [aria-label="Log in"]',
+      //   { timeout: 5000 }
+      // );
+
       return true;
     } catch (error) {
-      await AppLogger.logError(`Failed to navigate to profile ${username}:`, error);
+      await AppLogger.logMSG(
+        `Failed to navigate to profile ${username}:`,
+        error,
+      );
       throw error;
     }
   };
