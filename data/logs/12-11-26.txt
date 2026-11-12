@@ -93,3 +93,22 @@ Page.navigateTo(https://www.instagram.com/undefined/) called.
 Error in Page.navigateTo(https://www.instagram.com/undefined/) is as: Navigating frame was detached
 Failed to navigate to profile undefined:
 Failed to scrape posts from undefined:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Error in Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) is as: net::ERR_TIMED_OUT at https://www.instagram.com/Jitendra_goswami132/
+Profile Jitendra_goswami132 not found
+Scraping posts from: undefined
+Navigating to profile: https://www.instagram.com/undefined/
+Page.navigateTo(https://www.instagram.com/undefined/) called.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.

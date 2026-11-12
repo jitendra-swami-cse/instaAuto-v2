@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 
 // require("dotenv").config({
@@ -49,6 +49,22 @@ class ConfigManager {
     return defaultValue;
   };
 
+  createDownloadStructure = async (userName, createDirectories = true) => {
+    if (!createDirectories) {
+      return `./downloads/${userName}`;
+    }
+
+    const basePath = `./downloads/${userName}`;
+    const datePath = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+    const downloadPath = path.join(basePath, datePath);
+
+    await fs.ensureDir(downloadPath);
+    await fs.ensureDir(path.join(downloadPath, "images"));
+    await fs.ensureDir(path.join(downloadPath, "videos"));
+    await fs.ensureDir(path.join(downloadPath, "carousels"));
+
+    return downloadPath;
+  };
   //   getAccounts() {
   //   return this.accounts;
   // }

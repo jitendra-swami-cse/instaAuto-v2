@@ -13,10 +13,11 @@ async function main() {
   await AppLogger.init();
 
   // =========== Code under testing and Development ==============
+  const userName = "Jitendra_goswami132";
   // await Browser.initialize(2);
   await Instagram.init();
-  await Instagram.navigateToProfile("Jitendra_goswami132");
-  const profileInfo = await InstaScraper.scrapePosts();
+  await Instagram.navigateToProfile(userName);
+  const profileInfo = await InstaScraper.scrapePosts(userName);
   console.log("Profile Info:", profileInfo);
 
   // =========================

@@ -38,7 +38,11 @@ const AppLogger = require("../coreModules/AppLogger.js");
 const EnhancedPage = require("../coreModules/EnhancedPage.js");
 const Instagram = require("./Instagram.js");
 class InstaScraper {
-  constructor() {}
+  constructor() {
+    // Configuration properties
+    this.maxFileSize = 100 * 1024 * 1024; // 100MB
+    this.supportedMediaTypes = ["image", "video", "carousel"];
+  }
 
   /**
    * Extract profile information from current page
@@ -46,8 +50,9 @@ class InstaScraper {
    * @param {Object} page - Puppeteer page instance
    * @returns {Object} Profile data
    */
-  scrapeProfileMetadata = async () => {
+  scrapeProfileMetadata = async (userName) => {
     try {
+      if (userName) await Instagram.navigateToProfile(userName);
       return await Browser.page.evaluate(() => {
         // Extract profile data
         // const fullName = document.querySelector("h1").textContent.trim();
@@ -116,24 +121,36 @@ class InstaScraper {
    */
   scrapePosts = async (username, options = {}) => {
     try {
-      const { limit = 50, scrolls = 10 } = options;
+      const {
+        mediaTypes = ["image", "video", "carousel"],
+        maxItems = 50,
+        maxScrolls = 10,
+        skipExisting = true,
+        createDirectories = true,
+      } = options;
 
       await AppLogger.logMSG(`Scraping posts from: ${username}`);
 
       await Instagram.navigateToProfile(username);
 
-      // Check if profile is private
-      const isPrivate = await Browser.page.evaluate(
-        () =>
-          !![document.body].find((element) =>
-            element.textContent?.toLowerCase().includes("profile is private"),
-          ),
-      );
+      const profileMetaData = await this.scrapeProfileMetadata();
 
-      if (isPrivate) {
+      // Check if profile is private
+      if (profileMetaData?.isPrivate) {
         await AppLogger.logMSG(`Profile ${username} is private`);
         return [];
       }
+
+      if (profileMetaData.postsCount == 0) {
+        await AppLogger.logMSG(`Profile does have any posts to download.`);
+        return [];
+      }
+
+      if (
+        profileMetaData.postsCount < maxItems &&
+        profileMetaData.postsCount > 0
+      )
+        maxItems = postsCount;
 
       // Click on any post to open the modal
       // await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"]'); // Only posts
@@ -141,6 +158,11 @@ class InstaScraper {
         'a[href*="/p/"], a[href*="/reel/"]',
       ); // Either post or reel
 
+      // Create download directory structure
+      const downloadPath = await this.createDownloadStructure(
+        userName,
+        createDirectories,
+      );
       console.log("End Point.");
       // // Scroll to load posts
       // await scrollToLoadMore(Browser.page, scrolls, "article a");

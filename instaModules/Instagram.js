@@ -28,7 +28,10 @@ class Instagram {
       const url = `https://www.instagram.com/${username}/`;
 
       if (Browser.page.url() === url) {
-        AppLogger.logMSG(`Already on profile: ${url}`);
+        await Browser.EnhancedPage.waitForPageLoad();
+        AppLogger.logMSG(
+          `Already on profile: ${url}, But waiting for page load.`,
+        );
         return true;
       }
 

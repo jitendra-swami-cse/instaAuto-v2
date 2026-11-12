@@ -1,0 +1,15 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 13-11-26 00-00-04 =-=-=-=-=-=-
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Scraping posts from: Jitendra_goswami132
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Profile Jitendra_goswami132 not found
