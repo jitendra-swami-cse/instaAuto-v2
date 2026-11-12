@@ -16,6 +16,8 @@ async function main() {
   // await Browser.initialize(2);
   await Instagram.init();
   await Instagram.navigateToProfile("Jitendra_goswami132");
+  const profileInfo = await InstaScraper.extractProfileInfo();
+  console.log("Profile Info:", profileInfo);
 
   // =========================
   console.log("Ended........");
@@ -30,3 +32,7 @@ main();
 // const els = await EnhancedPage.getAllElementIds();
 // 2.
 // await InstaScraper.init();
+// 3.
+// await Instagram.init();
+// await Instagram.navigateToProfile("Jitendra_goswami132");
+// const profileInfo = await InstaScraper.extractProfileInfo();

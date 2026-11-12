@@ -21,3 +21,60 @@ Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
 Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
 Completed Navigation to chrome://new-tab-page/
 selectorString: svg[aria-label="Close"]
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+selectorString: svg[aria-label="Close"]
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to devtools://devtools/bundled/devtools_app.html?remoteBase=https://chrome-devtools-frontend.appspot.com/serve_file/@9a31f0acec1854d44e49a73fbf8017598151a583/&targetType=tab&can_dock=true&panel=elements
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Already on https://www.instagram.com/Jitendra_goswami132/.
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Already on https://www.instagram.com/Jitendra_goswami132/.
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Already on https://www.instagram.com/Jitendra_goswami132/.
+Failed to navigate to profile Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Already on https://www.instagram.com/Jitendra_goswami132/.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Already on https://www.instagram.com/Jitendra_goswami132/.
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+InstaScraper initialized for profile: 2
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/

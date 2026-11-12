@@ -1,3 +1,11 @@
+# Logged in or not and profile detection
+
+- One of the important analysis is as below to detect if user is logged in or not and if profile exists or not.
+- if title === "Instagram" => logged in
+  (if page contains text "Sorry, this page isn't available." means profile not exists and user is logged in)
+  else-If title contains "Profile isn't available" (for "Profile isn't available • Instagram") => profile not exists and user is not logged in
+  else close modal window as profile exists but user is not logged in.
+
 # Permissions Popup Handling -
 
 Question - In Browser.js (Browser Module) What the 2 Important Line as given below do and what happen if i remove Them?

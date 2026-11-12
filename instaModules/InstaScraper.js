@@ -54,6 +54,61 @@ class InstaScraper {
   //   };
   // }
 
+  /**
+   * Extract profile information from current page
+   * NOTE - This Work only when windowSize is = [815, 789] and screen zoom is 90% .
+   * @param {Object} page - Puppeteer page instance
+   * @returns {Object} Profile data
+   */
+  extractProfileInfo = async () => {
+    try {
+      return await Browser.page.evaluate(() => {
+        // Extract profile data
+        // const fullName = document.querySelector("h1").textContent.trim();
+        const username = document.querySelector("h2").textContent.trim();
+
+        const contentMeta = document.querySelectorAll('meta[name="description"]')[0]?.content;
+        const bio = contentMeta?.split("Instagram:")[1]?.trim();
+
+        // Extract counts
+        const followersCountText = contentMeta.substring(0, contentMeta.indexOf("Followers")).trim();
+        const followingCountText = contentMeta.split("Followers,")[1].split("Following")[0].trim();
+        const postsCountText = contentMeta.split("Following,")[1].split("Posts")[0].trim();
+
+        const profilePicUrl = document.querySelectorAll(`a[href="/${username}/"] img`)[0].src;
+
+        // Parse counts (handle K, M suffixes)
+        const parseCount = (text) => {
+          if (!text) return 0;
+          const cleanText = text.replace(/,/g, "");
+          if (cleanText.includes("K")) {
+            return Math.floor(parseFloat(cleanText) * 1000);
+          } else if (cleanText.includes("M")) {
+            return Math.floor(parseFloat(cleanText) * 1000000);
+          }
+          return parseInt(cleanText) || 0;
+        };
+
+        return {
+          // fullName,
+          username: username.replace("@", ""),
+          bio,
+          profilePicUrl,
+          postsCount: parseCount(postsCountText),
+          followersCount: parseCount(followersCountText),
+          followingCount: parseCount(followingCountText),
+          isPrivate: !![document.body].find((element) => element.textContent?.toLowerCase().includes("profile is private")),
+          isVerified: !!document.querySelector('svg[aria-label="Verified"]'),
+          scrapedAt: new Date().toISOString(),
+        };
+      });
+    } catch (error) {
+      console.error("Failed to extract profile info:", error);
+      return null;
+    }
+  };
+
+  // -=-=-=-=-= Above this line methods are tested and working -=-=-=-=-=
   async scrapeProfileMetadata(userName) {
     try {
       // Use new scraper
@@ -71,7 +126,6 @@ class InstaScraper {
       throw error;
     }
   }
-  // -=-=-=-=-= Above this line methods are tested and working -=-=-=-=-=
 
   async cleanup() {
     if (this.scraper) {
