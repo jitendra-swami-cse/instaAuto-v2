@@ -2,7 +2,7 @@ const ConfigManager = require("./coreModules/ConfigManager");
 const AppLogger = require("./coreModules/AppLogger");
 const Browser = require("./coreModules/Browser");
 const EnhancedPage = require("./coreModules/EnhancedPage");
-const InstaScraper = require("./instaModules/InstaScraper");
+const InstagramScraper = require("./instaModules/InstagramScraper.js");
 const Instagram = require("./instaModules/Instagram.js");
 
 async function main() {
@@ -15,13 +15,16 @@ async function main() {
   // =========== Code under testing and Development ==============
   const userName = "Jitendra_goswami132";
   // await Browser.initialize(2);
-  await Instagram.init();
-  await Instagram.navigateToProfile(userName);
-  const profileInfo = await InstaScraper.scrapePosts(userName);
+  // await Instagram.init();
+  // await Instagram.navigateToProfile(userName);
+  const profileInfo = await InstagramScraper.scrapePosts(userName);
   console.log("Profile Info:", profileInfo);
 
   // =========================
   console.log("Ended........");
+
+  // If url contains "/p/" than post media is either img or carousal of imgs-
+  //       - In case of img selector is -> 'article ._aagv img'
 }
 
 main();
@@ -32,8 +35,8 @@ main();
 // await EnhancedPage.navigateTo("https://www.youtube.com/");
 // const els = await EnhancedPage.getAllElementIds();
 // 2.
-// await InstaScraper.init();
+// await InstagramScraper.init();
 // 3.
 // await Instagram.init();
 // await Instagram.navigateToProfile("Jitendra_goswami132");
-// const profileInfo = await InstaScraper.scrapeProfileMetadata();
+// const profileInfo = await InstagramScraper.scrapeProfileMetadata();

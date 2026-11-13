@@ -27,6 +27,7 @@ class Instagram {
     try {
       const url = `https://www.instagram.com/${username}/`;
 
+      if (!Browser.page) await Browser.initialize();
       if (Browser.page.url() === url) {
         await Browser.EnhancedPage.waitForPageLoad();
         AppLogger.logMSG(

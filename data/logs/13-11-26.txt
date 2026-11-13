@@ -13,3 +13,36 @@ Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
 Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
 Completed Navigation to chrome://new-tab-page/
 Profile Jitendra_goswami132 not found
+Scraping posts from: Jitendra_goswami132
+Failed to navigate to profile Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Profile Jitendra_goswami132 not found
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 21
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Error in Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) is as: Navigating frame was detached
+Failed to navigate to profile Jitendra_goswami132:
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 21
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Profile Jitendra_goswami132 not found
+Failed to scrape posts from Jitendra_goswami132:
