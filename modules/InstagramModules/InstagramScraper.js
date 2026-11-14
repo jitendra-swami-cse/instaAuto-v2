@@ -134,22 +134,21 @@ class InstaScraper {
       // await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"]'); // Only posts
       await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]'); // Either post or reel
 
+      const links = [];
+      await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
+      links.push(await this.linkExtraction());
+
       // Create download directory structure
       const downloadPath = await ConfigManager.createDownloadStructure(username, createDirectories);
-      console.log("End Point.");
-      const links = [];
+
+      let postDownloaded = 1;
+      while (postDownloaded < maxItems) {
+        postDownloaded++;
+        await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
+        links.push(await this.linkExtraction());
+        console.log(`Post Downloaded ${postDownloaded}`);
+      }
       // -=-=- Testing and Development -=-=-=-
-      // 1. Wait for modal to load
-      await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
-
-      links.push(await this.linkExtraction());
-
-      await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
-      links.push(await this.linkExtraction());
-      // await utils.randomDelay(3,2)
-      await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
-      links.push(await this.linkExtraction());
-      // 2. Check for img post
 
       console.log(links);
       // // Scroll to load posts
