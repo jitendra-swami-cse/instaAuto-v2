@@ -10,15 +10,12 @@ class ConfigManager {
     // Paths
     // const userDataDir = require("path").resolve(__dirname, "../profiles");
 
-    this.configPath = path.join(__dirname, "..", "config");
+    this.configPath = path.join(__dirname, "..", "..", "config");
     this.instaConfigPath = path.join(this.configPath, "instaConfig.json");
     this.browserConfigPath = path.join(this.configPath, "borwserConfig.json");
 
     this.dataDirPath = path.join(__dirname, "..", "data");
-    this.profilesDataDirPath = path.join(
-      this.dataDirPath,
-      "allProfilesData.json",
-    );
+    this.profilesDataDirPath = path.join(this.dataDirPath, "allProfilesData.json");
 
     this.logsDirPath = path.join(this.dataDirPath, "logs");
 
@@ -26,6 +23,9 @@ class ConfigManager {
     this.environment = process.env.ENVIRONMENT || "development";
     this.instaConfig = {};
     this.browserConfig = {};
+
+    this.instaConfig = this.loadJson(this.instaConfigPath, {});
+    this.browserConfig = this.loadJson(this.browserConfigPath, {});
   }
 
   loadAll = () => {
@@ -41,10 +41,7 @@ class ConfigManager {
         return JSON.parse(data);
       }
     } catch (error) {
-      console.error(
-        `[ConfigManager] Error reading file ${filePath}:`,
-        error.message,
-      );
+      console.error(`[ConfigManager] Error reading file ${filePath}:`, error.message);
     }
     return defaultValue;
   };

@@ -42,8 +42,8 @@
               - returns false if page is not loaded in "options.timeOut" 
               - throws an error if "options.continueOnError" is set to "true" */
 // const catchAsync = require("../utils/catchAsync");
-const AppLogger = require("../coreModules/AppLogger");
-const utils = require("../utils/utils");
+const Logger = require("./Logger");
+const utils = require("../../utils/utils");
 
 class EnhancedPage {
   constructor() {
@@ -64,10 +64,10 @@ class EnhancedPage {
 
   navigateTo = async (url) => {
     try {
-      AppLogger.logMSG(`Page.navigateTo(${url}) called.`);
+      Logger.logMSG(`Page.navigateTo(${url}) called.`);
       const currentURL = this.page.url();
       if (currentURL.includes(url)) {
-        AppLogger.logMSG(`Already on ${url}.`);
+        Logger.logMSG(`Already on ${url}.`);
         return;
       }
       await this.page.goto(url, {
@@ -79,11 +79,9 @@ class EnhancedPage {
         domContentLoaded: true, // Wait for DOMContentLoaded event
         // defaultViewport: { width: 1920, height: 1080 }, // Custom viewport settings
       });
-      AppLogger.logMSG(`Completed Navigation to ${currentURL}`);
+      Logger.logMSG(`Completed Navigation to ${currentURL}`);
     } catch (error) {
-      AppLogger.logMSG(
-        `Error in Page.navigateTo(${url}) is as: ${error.message}`,
-      );
+      Logger.logMSG(`Error in Page.navigateTo(${url}) is as: ${error.message}`);
     }
   };
 
@@ -249,7 +247,7 @@ class EnhancedPage {
 
   goBackToPreviousPage = async () => {
     try {
-      AppLogger.logMSG(`Page.goBack() called...`);
+      Logger.logMSG(`Page.goBack() called...`);
       await this.page.goBack({
         waitUntil: "networkidle0", // Wait until network is idle
         timeout: 300000, // 5 minutes Timeout in milliseconds
@@ -259,18 +257,17 @@ class EnhancedPage {
         domContentLoaded: true, // Wait for DOMContentLoaded event
         // defaultViewport: { width: 1920, height: 1080 }, // Custom viewport settings
       });
-      AppLogger.logMSG(`Completed Back Navigation.`);
+      Logger.logMSG(`Completed Back Navigation.`);
     } catch (error) {
-      AppLogger.logMSG(`Error in Page.navigateTo() is as: ${error.message}`);
+      Logger.logMSG(`Error in Page.navigateTo() is as: ${error.message}`);
     }
   };
 
   // ==== 👇🏻 for Testing & Debugging 👇🏻 ====
   waitForElementRobust = async (textOrSelector, text = false) => {
     // text = false;
-    let selectorString =
-      text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
-    AppLogger.logMSG(`selectorString: ${selectorString}`);
+    let selectorString = text === true ? `::-p-text(${textOrSelector})` : textOrSelector;
+    Logger.logMSG(`selectorString: ${selectorString}`);
 
     const element = await this.page.locator(selectorString).waitHandle();
     if (!element) {
@@ -299,10 +296,7 @@ class EnhancedPage {
 
     // Arrow function captures `this` and outer variables automatically
     const waitSearchnClick = async () => {
-      const element =
-        typeof textOrSelectorOrElement === "string"
-          ? await this.waitForElementRobust(textOrSelectorOrElement, text)
-          : textOrSelectorOrElement;
+      const element = typeof textOrSelectorOrElement === "string" ? await this.waitForElementRobust(textOrSelectorOrElement, text) : textOrSelectorOrElement;
 
       if (!element) {
         throw new Error(`Element not found: ${textOrSelectorOrElement}`);
@@ -310,9 +304,7 @@ class EnhancedPage {
 
       const boundingBox = await element.boundingBox();
       if (!boundingBox) {
-        throw new Error(
-          `Bounding Box not found for: ${textOrSelectorOrElement}`,
-        );
+        throw new Error(`Bounding Box not found for: ${textOrSelectorOrElement}`);
       }
 
       const { x, y, width, height } = boundingBox;
@@ -358,17 +350,11 @@ class EnhancedPage {
 
     // Clear the input field
     await inputField.evaluate((el) => (el.value = ""));
-    AppLogger.logMSG(
-      `----- stringToType: ${stringToType} ---causing the error --`,
-    );
+    Logger.logMSG(`----- stringToType: ${stringToType} ---causing the error --`);
 
     for (let char of stringToType) {
       // Simulate typing delay
-      const delay =
-        Math.floor(
-          Math.random() *
-            (options.maximumDelayInMs - options.minimumDelayInMs + 1),
-        ) + options.minimumDelayInMs;
+      const delay = Math.floor(Math.random() * (options.maximumDelayInMs - options.minimumDelayInMs + 1)) + options.minimumDelayInMs;
 
       // Introduce a typo based on the typo chance
       let typedChar = char;
@@ -387,12 +373,7 @@ class EnhancedPage {
 
           // Simulate backspacing to remove the typo
           const backspaceDelay =
-            Math.floor(
-              Math.random() *
-                (options.backspaceMaximumDelayInMs -
-                  options.backspaceMinimumDelayInMs +
-                  1),
-            ) + options.backspaceMinimumDelayInMs;
+            Math.floor(Math.random() * (options.backspaceMaximumDelayInMs - options.backspaceMinimumDelayInMs + 1)) + options.backspaceMinimumDelayInMs;
           await utils.delay(backspaceDelay);
 
           // Type backspace to remove the last character (the typo)
@@ -412,9 +393,7 @@ class EnhancedPage {
   // ========== 👆 Above Code is Checked not tested 👆 ==========
   checkVisibilityBeforeClick = async (selector) => {
     return await this.page.evaluate((selector) => {
-      const subBTN = Array.from(document.querySelectorAll(selector)).find(
-        (el) => el.checkVisibility(),
-      );
+      const subBTN = Array.from(document.querySelectorAll(selector)).find((el) => el.checkVisibility());
       // subBTN.click();
       // return subBTN.textContent;
       return subBTN;
@@ -434,12 +413,7 @@ class EnhancedPage {
    * @param {number} timeoutMs - The timeout in milliseconds after which the method will return false. Default is 30000.
    * @returns {(string | false)} The new URL if the URL changed, false otherwise.
    */
-  waitForURLChange = async (
-    beforePageURL,
-    maxAttempts = 5,
-    delayMs = 3000,
-    timeoutMs = 30000,
-  ) => {
+  waitForURLChange = async (beforePageURL, maxAttempts = 5, delayMs = 3000, timeoutMs = 30000) => {
     let flag;
     try {
       flag = await utils.robustPolling(
@@ -448,9 +422,7 @@ class EnhancedPage {
             await this.waitForPageLoad();
             return this.page.url();
           }
-          throw new Error(
-            `URL has not changed yet. Still on: ${beforePageURL}`,
-          );
+          throw new Error(`URL has not changed yet. Still on: ${beforePageURL}`);
         },
         {
           maxAttempts,
@@ -460,11 +432,11 @@ class EnhancedPage {
         },
       );
     } catch (error) {
-      AppLogger.logMSG(`--------- Error in waitForURLChange ---------`);
-      AppLogger.logMSG(`beforePageURL: ${beforePageURL}`);
-      AppLogger.logMSG(`this.page.url(): ${this.page.url()}`);
-      AppLogger.logMSG(`error: ${error}`);
-      AppLogger.logMSG(`--------- Error in waitForURLChange ---------`);
+      Logger.logMSG(`--------- Error in waitForURLChange ---------`);
+      Logger.logMSG(`beforePageURL: ${beforePageURL}`);
+      Logger.logMSG(`this.page.url(): ${this.page.url()}`);
+      Logger.logMSG(`error: ${error}`);
+      Logger.logMSG(`--------- Error in waitForURLChange ---------`);
       flag = false;
     } finally {
       return flag;
@@ -482,15 +454,9 @@ class EnhancedPage {
         const searchText = text.trim().toLowerCase();
 
         // No selectors supplied: search the entire document.
-        const elements = selectorsArray?.length
-          ? selectorsArray.flatMap((selector) => [
-              ...document.querySelectorAll(selector),
-            ])
-          : [document.body];
+        const elements = selectorsArray?.length ? selectorsArray.flatMap((selector) => [...document.querySelectorAll(selector)]) : [document.body];
 
-        return elements.some((element) =>
-          element.textContent?.toLowerCase().includes(searchText),
-        );
+        return elements.some((element) => element.textContent?.toLowerCase().includes(searchText));
       },
       { text, selectorsArray },
     );
@@ -499,7 +465,7 @@ class EnhancedPage {
   listAllFrames = async () => {
     const frames = this.page.frames();
     for (const frame of frames) {
-      AppLogger.logMSG(`Frame URL: ${frame.url()}`);
+      Logger.logMSG(`Frame URL: ${frame.url()}`);
     }
   };
 
@@ -507,27 +473,18 @@ class EnhancedPage {
     const elements = await this.page.$$("*");
     for (const element of elements) {
       const tagName = await element.evaluate((el) => el.tagName);
-      AppLogger.logMSG(`Element: ${tagName}`);
+      Logger.logMSG(`Element: ${tagName}`);
     }
   };
 
   getAllElementIds = async (unique = false) => {
-    const isUnique =
-      typeof unique === "object" && unique !== null
-        ? Boolean(unique.unique)
-        : Boolean(unique);
+    const isUnique = typeof unique === "object" && unique !== null ? Boolean(unique.unique) : Boolean(unique);
 
     return await this.page.evaluate((isUnique) => {
-      const ids = Array.from(
-        document.querySelectorAll("[id]"),
-        (el) => el.id,
-      ).filter(Boolean);
+      const ids = Array.from(document.querySelectorAll("[id]"), (el) => el.id).filter(Boolean);
       if (!isUnique) return ids;
 
-      const counts = ids.reduce(
-        (acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc),
-        {},
-      );
+      const counts = ids.reduce((acc, id) => ((acc[id] = (acc[id] || 0) + 1), acc), {});
       return ids.filter((id) => counts[id] === 1);
     }, isUnique);
   };
@@ -600,9 +557,7 @@ class EnhancedPage {
         if (!parent || parent === document.body) {
           return el.tagName.toLowerCase();
         }
-        const siblings = Array.from(parent.children).filter(
-          (c) => c.tagName === el.tagName,
-        );
+        const siblings = Array.from(parent.children).filter((c) => c.tagName === el.tagName);
         const index = siblings.indexOf(el) + 1;
         const parentPrefix = parent.id ? `#${CSS.escape(parent.id)} > ` : "";
         return `${parentPrefix}${el.tagName.toLowerCase()}:nth-of-type(${index})`;
@@ -622,10 +577,7 @@ class EnhancedPage {
           .join(" ");
 
         if (directText.length > 0) {
-          const openingTag = el.outerHTML.slice(
-            0,
-            el.outerHTML.indexOf(">") + 1,
-          );
+          const openingTag = el.outerHTML.slice(0, el.outerHTML.indexOf(">") + 1);
 
           result.push({
             tagName: el.tagName.toLowerCase(),
@@ -883,7 +835,7 @@ const interceptRequests = async function (options, filterFn, handlerFn) {
 //   // ==== 👇🏻 Event Handler 👇🏻 ====
 //   page.on("framenavigated", async (frame) => {
 //     if (frame === this.page.mainFrame()) {
-//       this.appLogger?.logMSG(`Navigated to: ${frame.url()}`);
+//       this.Logger?.logMSG(`Navigated to: ${frame.url()}`);
 
 //       const randomPageHandlers = {
 //         // url:"selectorStringToClick"
@@ -896,7 +848,7 @@ const interceptRequests = async function (options, filterFn, handlerFn) {
 //           );
 
 //           if (randomPage) {
-//             await this.appLogger?.logMSG(
+//             await this.Logger?.logMSG(
 //               `== Random Page : ${randomPage.url()}`,
 //             );
 //             await utils.randomDelay(1.5, 2); // Add a small delay for stability

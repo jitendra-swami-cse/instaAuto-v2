@@ -1,9 +1,9 @@
-// const config = require("./ConfigManager");
+
 const ConfigManager = require("./ConfigManager");
-const AppLogger = require("./AppLogger");
-const { getBrowser } = require("../utils/getBrowser");
+const Logger = require("./Logger");
+const { getBrowser } = require("../../utils/getBrowser");
 const EnhancedPage = require("./EnhancedPage");
-// const hookMethodsOnPage = require("../uncategorized/pageHookFunctions");
+
 
 class Browser {
   constructor() {
@@ -15,7 +15,7 @@ class Browser {
   initialize = async (profileTarget) => {
     try {
       this.profileTarget = profileTarget || ConfigManager.browserConfig.profileTarget;
-      AppLogger.logMSG(`Initializing browser for profile target: ${this.profileTarget}`);
+      Logger.logMSG(`Initializing browser for profile target: ${this.profileTarget}`);
 
       const browserOptions = {
         profileTarget: this.profileTarget,
@@ -32,7 +32,7 @@ class Browser {
       //     browser: this.browser,
       //     page: this.page,
       //     utils: require("../utils/utils"),
-      //     appLogger: this.appLogger,
+      //     Logger: this.Logger,
       //   },
       //   this.page,
       // );
@@ -42,17 +42,17 @@ class Browser {
       // const context = this.browser.defaultBrowserContext();
       // await context.overridePermissions("https://www.youtube.com/", []);
       // Check Developer Helper.md have the reason why above 3 lines are commented as flag ---deny-permission-prompts added in getBrowser.js .
-      AppLogger.logMSG(`Browser initialized successfully for profile: ${profileTarget}`);
+      Logger.logMSG(`Browser initialized successfully for profile: ${profileTarget}`);
       return true;
     } catch (error) {
-      AppLogger.logMSG(`Failed to initialize browser: ${error}`);
+      Logger.logMSG(`Failed to initialize browser: ${error}`);
       throw error;
     }
   };
 
   reconnect = async () => {
     try {
-      AppLogger.logMSG("Reconnecting browser...");
+      Logger.logMSG("Reconnecting browser...");
 
       if (this.browser) {
         await this.close();
@@ -61,7 +61,7 @@ class Browser {
       await this.initialize(this.profileTarget);
       return true;
     } catch (error) {
-      AppLogger.logMSG(`Failed to reconnect browser: ${error}`);
+      Logger.logMSG(`Failed to reconnect browser: ${error}`);
       throw error;
     }
   };
@@ -70,12 +70,12 @@ class Browser {
     try {
       if (this.browser) {
         await this.browser.close();
-        AppLogger.logMSG("Browser closed successfully");
+        Logger.logMSG("Browser closed successfully");
       }
       this.browser = null;
       this.page = null;
     } catch (error) {
-      AppLogger.logMSG(`Error closing browser: ${error}`);
+      Logger.logMSG(`Error closing browser: ${error}`);
       throw error;
     }
   };
@@ -96,7 +96,7 @@ class Browser {
   listAllPages = async () => {
     const pages = await this.browser.pages();
     for (const page of pages) {
-      AppLogger.logMSG(`Page URL: ${page.url()}`);
+      Logger.logMSG(`Page URL: ${page.url()}`);
     }
   };
 
@@ -115,9 +115,9 @@ class Browser {
       } else {
         await this.navigateTo("https://www.instagram.com/");
       }
-      AppLogger.logMSG("Navigated to Instagram home");
+      Logger.logMSG("Navigated to Instagram home");
     } catch (error) {
-      AppLogger.logMSG("Home button not available, navigating directly to home page");
+      Logger.logMSG("Home button not available, navigating directly to home page");
       await this.navigateTo("https://www.instagram.com/");
     }
   };
@@ -125,11 +125,11 @@ class Browser {
   goToProfile = async (userName) => {
     const profileUrl = `https://www.instagram.com/${userName}/`;
     await this.navigateTo(profileUrl);
-    AppLogger.logMSG(`Navigated to profile: ${userName}`);
+    Logger.logMSG(`Navigated to profile: ${userName}`);
   };
 
   searchUser = async (userName) => {
-    AppLogger.logMSG(`Searching for user: ${userName}`);
+    Logger.logMSG(`Searching for user: ${userName}`);
 
     // Click search button
     await this.page.clickNotClickable('[aria-label="Search"]');
@@ -145,7 +145,7 @@ class Browser {
 
     // Click on the user
     await this.page.clickNotClickable(`span ::-p-text(${userName})`);
-    AppLogger.logMSG(`Selected user: ${userName} from search results`);
+    Logger.logMSG(`Selected user: ${userName} from search results`);
   };
 
   clickFollow = async () => {
@@ -167,7 +167,7 @@ class Browser {
     // Check current button text
     const buttonText = await this.page.getText(followBtn);
     if (buttonText === "Following") {
-      AppLogger.logMSG("Already following this user");
+      Logger.logMSG("Already following this user");
       return { alreadyFollowing: true };
     }
 
@@ -185,7 +185,7 @@ class Browser {
     let attempts = 0;
     while (attempts < 10) {
       if (await waitForFollow()) {
-        AppLogger.logMSG("Follow action completed successfully");
+        Logger.logMSG("Follow action completed successfully");
         return { success: true };
       }
       await this.randomDelay(1, 0.5);
@@ -219,10 +219,10 @@ class Browser {
 
     if (ariaLabel === "Like") {
       await this.page.clickNotClickable(likeButton);
-      AppLogger.logMSG("Post liked successfully");
+      Logger.logMSG("Post liked successfully");
       return { liked: true };
     } else {
-      AppLogger.logMSG("Post already liked");
+      Logger.logMSG("Post already liked");
       return { alreadyLiked: true };
     }
   };

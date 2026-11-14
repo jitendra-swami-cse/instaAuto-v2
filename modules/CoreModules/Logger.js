@@ -40,7 +40,7 @@ async function createLogFile() {
   }
 }
 
-class Applogger {
+class Logger {
   constructor() {
     this.startTime = Date.now();
   }
@@ -75,7 +75,7 @@ class Applogger {
 
   logAction = async () => {
     await this.logMSG(JSON.stringify(this.currentAction, null, 2) + "\n\n");
-    await this.appLogger.logLineBreak();
+    await this.Logger.logLineBreak();
   };
 
   logState = async () => {
@@ -109,4 +109,4 @@ class Applogger {
   };
 }
 
-module.exports = new Applogger();
+module.exports = new Logger();

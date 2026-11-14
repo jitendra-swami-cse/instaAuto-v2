@@ -1,16 +1,16 @@
-const ConfigManager = require("./coreModules/ConfigManager");
-const AppLogger = require("./coreModules/AppLogger");
-const Browser = require("./coreModules/Browser");
-const EnhancedPage = require("./coreModules/EnhancedPage");
-const InstagramScraper = require("./instaModules/InstagramScraper.js");
-const Instagram = require("./instaModules/Instagram.js");
+const ConfigManager = require("./modules/CoreModules/ConfigManager.js");
+const Logger = require("./modules/CoreModules/Logger.js");
+const Browser = require("./modules/CoreModules/Browser");
+const EnhancedPage = require("./modules/CoreModules/EnhancedPage");
+const InstagramScraper = require("./modules/InstagramModules/InstagramScraper.js");
+const Instagram = require("./modules/InstagramModules/Instagram.js");
 
 async function main() {
   console.log("Starting.....");
 
   // -=-=-=-=-=-=-= Init Configs and Logger -=-=-=-=-=-=-=
-  ConfigManager.loadAll();
-  await AppLogger.init();
+
+  await Logger.init();
 
   // =========== Code under testing and Development ==============
   const userName = "Jitendra_goswami132";
