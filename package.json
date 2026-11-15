@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "start0": "node ./index.js",
-    "start1": "node ./utils/testWithBrowser.js",
-    "start2": "node ./functionsLibrary/db.js"
+    "test": "node ./testScript.js"
   },
+  "type": "commonjs",
   "keywords": [],
   "author": "",
   "license": "ISC",

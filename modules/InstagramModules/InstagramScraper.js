@@ -143,10 +143,14 @@ class InstaScraper {
       const downloadPath = await ConfigManager.createDownloadStructure(username, createDirectories);
 
       let postDownloaded = 1;
+      let currentLink;
       while (postDownloaded < maxItems) {
         postDownloaded++;
         await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
-        links.push(await this.linkExtraction());
+        await utils.randomDelay(2, 1);
+        currentLink = await this.linkExtraction();
+        links.push(currentLink);
+        if (currentLink.type === "video") await this.downloadInstagramVideo(Browser.page, currentLink.link, downloadPath);
         console.log(`Post Downloaded ${postDownloaded}`);
       }
       // -=-=- Testing and Development -=-=-=-
@@ -156,7 +160,9 @@ class InstaScraper {
 
       console.log(videoLinks);
 
-      downloadInstagramVideo(videoLinks);
+      await this.downloadInstagramVideo(Browser.page, videoLinks[0].link, downloadPath);
+
+      console.log("Downloaded please check.");
       // // Scroll to load posts
       // await scrollToLoadMore(Browser.page, scrolls, "article a");
 
@@ -202,9 +208,9 @@ class InstaScraper {
     return link;
   };
 
-  downloadInstagramVideo = async (page, videoElement, outputPath) => {
-    const base64 = await page.evaluate(async (video) => {
-      const response = await fetch(video.src);
+  downloadInstagramVideo = async (page, src, outputPath) => {
+    const base64 = await page.evaluate(async (src) => {
+      const response = await fetch(src);
       const blob = await response.blob();
 
       return new Promise((resolve, reject) => {
@@ -217,7 +223,7 @@ class InstaScraper {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
-    }, videoElement);
+    }, src);
 
     fs.writeFileSync(outputPath, Buffer.from(base64, "base64"));
   };
