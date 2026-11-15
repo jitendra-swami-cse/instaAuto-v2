@@ -181,3 +181,50 @@ Initializing browser for profile target: 2
 Browser initialized successfully for profile: 2
 Initializing browser for profile target: 2
 Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Error in Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) is as: net::ERR_INTERNET_DISCONNECTED at https://www.instagram.com/Jitendra_goswami132/
+Profile Jitendra_goswami132 not found
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Browser closed successfully
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
