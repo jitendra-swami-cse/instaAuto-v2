@@ -2,24 +2,24 @@
 // async initialize(profile)
 // async cleanup()
 // // =============== PROFILE SCRAPING ===============
-// async scrapeUserProfile(targetUserName, options = {})
-// async scrapeProfileMetadata(userName
-// async scrapeUserPosts(userName, maxPosts = 50)
-// async scrapeUserFollowers(userName, maxFollowers = 1000)
-// async scrapeUserFollowings(userName, maxFollowings = 1000)
+// async scrapeUserProfile(targetusername, options = {})
+// async scrapeProfileMetadata(username
+// async scrapeUserPosts(username, maxPosts = 50)
+// async scrapeUserFollowers(username, maxFollowers = 1000)
+// async scrapeUserFollowings(username, maxFollowings = 1000)
 // // =============== HELPER METHODS ===============
 // async extractPostsFromPage(maxPosts)
-// async saveScrapedData(userName, scrapedData)
+// async saveScrapedData(username, scrapedData)
 // // =============== BATCH SCRAPING ===============
-// async scrapeBatchProfiles(userNames, options = {})
+// async scrapeBatchProfiles(usernames, options = {})
 // generateBatchSummary(results)
 // // =============== TARGET MANAGEMENT ===============
-// async addScrapingTarget(userName, targetType = "profile")
-// async markTargetAsScraped(userName)
+// async addScrapingTarget(username, targetType = "profile")
+// async markTargetAsScraped(username)
 // // =============== STATISTICS AND MONITORING ===============
 // getScrapingStats()
 // resetSessionStats()
-// async getScrapingHistory(userName = null, days = 7)
+// async getScrapingHistory(username = null, days = 7)
 // // =============== RATE LIMITING AND SAFETY ===============
 // async checkScrapingLimits()
 // async waitForRateLimit(seconds = 60)
@@ -39,6 +39,7 @@ const Logger = require("../CoreModules/Logger.js");
 const EnhancedPage = require("../CoreModules/EnhancedPage.js");
 const Instagram = require("./Instagram.js");
 const utils = require("../../utils/utils.js");
+const path = require("path");
 
 class InstaScraper {
   constructor() {
@@ -53,35 +54,24 @@ class InstaScraper {
    * @param {Object} page - Puppeteer page instance
    * @returns {Object} Profile data
    */
-  scrapeProfileMetadata = async (userName) => {
+  scrapeProfileMetadata = async (username) => {
     try {
-      if (userName) await Instagram.navigateToProfile(userName);
-      return await Browser.page.evaluate(() => {
+      if (username) await Instagram.navigateToProfile(username);
+
+      const profileMetaData = await Browser.page.evaluate(() => {
         // Extract profile data
         // const fullName = document.querySelector("h1").textContent.trim();
         const username = document.querySelector("h2").textContent.trim();
 
-        const contentMeta = document.querySelectorAll(
-          'meta[name="description"]',
-        )[0]?.content;
+        const contentMeta = document.querySelectorAll('meta[name="description"]')[0]?.content;
         const bio = contentMeta?.split("Instagram:")[1]?.trim();
 
         // Extract counts
-        const followersCountText = contentMeta
-          .substring(0, contentMeta.indexOf("Followers"))
-          .trim();
-        const followingCountText = contentMeta
-          .split("Followers,")[1]
-          .split("Following")[0]
-          .trim();
-        const postsCountText = contentMeta
-          .split("Following,")[1]
-          .split("Posts")[0]
-          .trim();
+        const followersCountText = contentMeta.substring(0, contentMeta.indexOf("Followers")).trim();
+        const followingCountText = contentMeta.split("Followers,")[1].split("Following")[0].trim();
+        const postsCountText = contentMeta.split("Following,")[1].split("Posts")[0].trim();
 
-        const profilePicUrl = document.querySelectorAll(
-          `a[href="/${username}/"] img`,
-        )[0].src;
+        const profilePicUrl = document.querySelectorAll(`a[href="/${username}/"] img`)[0].src;
 
         // Parse counts (handle K, M suffixes)
         const parseCount = (text) => {
@@ -96,20 +86,26 @@ class InstaScraper {
         };
 
         return {
-          // fullName,
           username: username.replace("@", ""),
           bio,
           profilePicUrl,
           postsCount: parseCount(postsCountText),
           followersCount: parseCount(followersCountText),
           followingCount: parseCount(followingCountText),
-          isPrivate: !![document.body].find((element) =>
-            element.textContent?.toLowerCase().includes("profile is private"),
-          ),
+          isPrivate: !![document.body].find((element) => element.textContent?.toLowerCase().includes("profile is private")),
           isVerified: !!document.querySelector('svg[aria-label="Verified"]'),
           scrapedAt: new Date().toISOString(),
         };
       });
+
+      ConfigManager.currentProfile = profileMetaData;
+
+      // Create Profile directory structure
+      ConfigManager.currentProfile.profilePath = await ConfigManager.createProfileStructure(username);
+
+      await fs.writeJson(`${ConfigManager.currentProfile.profilePath}/${username}.json`, ConfigManager.currentProfile, { spaces: 2 });
+
+      return ConfigManager.currentProfile;
     } catch (error) {
       await Logger.logError("Failed to extract profile info:", error);
       return null;
@@ -124,85 +120,49 @@ class InstaScraper {
    */
   scrapePosts = async (username, options = {}) => {
     try {
-      let {
-        mediaTypes = ["image", "video", "carousel"],
-        maxItems = 50,
-        maxScrolls = 10,
-        skipExisting = true,
-        createDirectories = true,
-      } = options;
+      let { mediaTypes = ["image", "video", "carousel"], maxItems = 50, maxScrolls = 10, skipExisting = true, createDirectories = true } = options;
 
       await Logger.logMSG(`Scraping posts from: ${username}`);
 
       await Instagram.navigateToProfile(username);
 
-      const profileMetaData = await this.scrapeProfileMetadata();
+      const currentProfile = await this.scrapeProfileMetadata(username);
 
       // Check if profile is private
-      if (profileMetaData?.isPrivate) {
+      if (currentProfile?.isPrivate) {
         await Logger.logMSG(`Profile ${username} is private`);
         return [];
       }
 
-      if (profileMetaData.postsCount == 0) {
+      if (currentProfile.postsCount == 0) {
         await Logger.logMSG(`Profile does have any posts to download.`);
         return [];
       }
 
-      if (
-        profileMetaData.postsCount < maxItems &&
-        profileMetaData.postsCount > 0
-      )
-        maxItems = profileMetaData.postsCount;
+      if (currentProfile.postsCount < maxItems && currentProfile.postsCount > 0) maxItems = currentProfile.postsCount;
 
       // Click on any post to open the modal
       // await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"]'); // Only posts
-      await Browser.EnhancedPage.clickNotClickable(
-        'a[href*="/p/"], a[href*="/reel/"]',
-      ); // Either post or reel
+      await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]'); // Either post or reel
 
       const links = [];
-      await Browser.EnhancedPage.waitForElementRobust(
-        'div[role="dialog"] article',
-      );
-      links.push(await this.linkExtraction());
 
-      // Create download directory structure
-      const downloadPath = await ConfigManager.createDownloadStructure(
-        username,
-        createDirectories,
-      );
+      await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
       let postDownloaded = 1;
-      let currentLink;
+      let postMedia;
       while (postDownloaded < maxItems) {
+        postMedia = await this.postMediaExtraction();
+        links.push(postMedia);
+
+        await this.downloadPostMedia(postMedia);
+
         postDownloaded++;
         await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
         await utils.randomDelay(2, 1);
-        currentLink = await this.linkExtraction();
-        links.push(currentLink);
-        if (currentLink.type === "video")
-          await this.downloadInstagramVideo(
-            Browser.page,
-            currentLink.link,
-            downloadPath,
-          );
-        console.log(`Post Downloaded ${postDownloaded}`);
       }
       // -=-=- Testing and Development -=-=-=-
       console.log(links);
-
-      const videoLinks = links.filter((link) => link.type == "video");
-
-      console.log(videoLinks);
-
-      await this.downloadInstagramVideo(
-        Browser.page,
-        videoLinks[0].link,
-        downloadPath,
-      );
-
-      console.log("Downloaded please check.");
       // // Scroll to load posts
       // await scrollToLoadMore(Browser.page, scrolls, "article a");
 
@@ -236,17 +196,75 @@ class InstaScraper {
     }
   };
 
+  postMediaExtraction = async () => {
+    const postMedia = await Browser.page.evaluate(() => {
+      if (document.querySelector("article video"))
+        return {
+          postType: "video",
+          postLink: document.querySelector("article video").src,
+        };
+      else if (document.querySelector('article [aria-label="Next"]')) return { postType: "carousel", postLink: "yet not" };
+      else if (document.querySelector("article ._aagv img"))
+        return {
+          postType: "image",
+          postLink: document.querySelector("article ._aagv img").src,
+        };
+      else return { type: false };
+    });
+    return postMedia;
+  };
+
+  downloadPostMedia = async (postMedia) => {
+    // Post must be open on page in selector "article"
+    const { postType, postLink } = postMedia;
+
+    if (postMedia.postType === "video") await this.downloadInstagramPostVideo();
+    console.log(`Post Downloaded`);
+  };
+
+  downloadInstagramPostVideo = async () => {
+    const page = Browser.page;
+    const isVideoPresent = await page.evaluate(() => !!document.querySelector("article video"));
+
+    if (!isVideoPresent) {
+      Logger.logMSG("can't Download — no video found on page.");
+      return false;
+    }
+
+    const { profilePath, username } = ConfigManager.currentProfile.profilePath;
+    const VIDEO_SAVE_PATH = path.resolve(profilePath, "video", username);
+
+    // 👇 page.evaluate now resolves only when the page's promise resolves,
+    // i.e. after the recording finished and the data URL is available.
+    const dataUrl = await page.evaluate(async (fnSource) => {
+      const recordVideo = new Function(`return (${fnSource})`)();
+      return await recordVideo();
+    }, this.recordVideo.toString());
+
+    if (!dataUrl) {
+      Logger.logMSG("Video can't Downloaded by current. Code Check n modify code.");
+      return false;
+    }
+
+    // Strip the "data:video/webm;base64," prefix and write to disk.
+    const base64 = dataUrl.split(",")[1];
+    const buffer = Buffer.from(base64, "base64");
+
+    await fs.mkdir(path.dirname(VIDEO_SAVE_PATH), { recursive: true });
+    await fs.writeFile(VIDEO_SAVE_PATH, buffer);
+
+    console.log(`Video recording is Done. Saved to: ${VIDEO_SAVE_PATH}`);
+    console.log(`File size: ${buffer.length / 1024 / 1024} MB`);
+
+    console.log("Ended........");
+  };
   recordVideo = async () => {
     const video = document.querySelector("video");
-    const stream = video.captureStream
-      ? video.captureStream()
-      : video.mozCaptureStream();
+    const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
 
     const chunks = [];
     const recorder = new MediaRecorder(stream, {
-      mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-        ? "video/webm;codecs=vp9,opus"
-        : "video/webm",
+      mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? "video/webm;codecs=vp9,opus" : "video/webm",
     });
 
     recorder.ondataavailable = (event) => {
@@ -275,48 +293,6 @@ class InstaScraper {
     video.addEventListener("ended", () => recorder.stop(), { once: true });
     return true;
   };
-
-  linkExtraction = async () => {
-    const link = await Browser.page.evaluate(() => {
-      let type;
-      if (document.querySelector("article video"))
-        return {
-          type: "video",
-          link: document.querySelector("article video").src,
-        };
-      else if (document.querySelector('article [aria-label="Next"]'))
-        return { type: "carousel", link: "yet not" };
-      else if (document.querySelector("article ._aagv img"))
-        return {
-          type: "image",
-          link: document.querySelector("article ._aagv img").src,
-        };
-      else return { type: false };
-    });
-    console.log(link);
-    return link;
-  };
-
-  downloadInstagramVideo = async (page, src, outputPath) => {
-    const base64 = await page.evaluate(async (src) => {
-      const response = await fetch(src);
-      const blob = await response.blob();
-
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          resolve(reader.result.split(",")[1]);
-        };
-
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-      });
-    }, src);
-
-    fs.writeFileSync(outputPath, Buffer.from(base64, "base64"));
-  };
-
   // -=-=-=-=-= Above this line methods are tested and working -=-=-=-=-=
 
   async cleanup() {
@@ -328,73 +304,56 @@ class InstaScraper {
   }
 
   // =============== PROFILE SCRAPING ===============
-  async scrapeUserProfile(targetUserName, options = {}) {
-    const {
-      includeMetadata = true,
-      includePosts = true,
-      includeFollowers = false,
-      includeFollowings = false,
-      maxPosts = 50,
-      maxFollowers = 1000,
-    } = options;
+  async scrapeUserProfile(targetusername, options = {}) {
+    const { includeMetadata = true, includePosts = true, includeFollowers = false, includeFollowings = false, maxPosts = 50, maxFollowers = 1000 } = options;
 
     try {
-      await this.logger.info(
-        `Starting profile scraping for: ${targetUserName}`,
-      );
+      await this.logger.info(`Starting profile scraping for: ${targetusername}`);
 
       if (!this.currentProfile) {
-        throw new Error(
-          "Scraping service not initialized. Call initialize() first.",
-        );
+        throw new Error("Scraping service not initialized. Call initialize() first.");
       }
 
       const scrapingResult = {
-        userName: targetUserName,
+        username: targetusername,
         scrapedAt: new Date().toISOString(),
-        scrapedBy: this.currentProfile.userName,
+        scrapedBy: this.currentProfile.username,
         success: true,
       };
 
       // Scrape profile metadata
       if (includeMetadata) {
-        await this.logger.info(`Scraping metadata for: ${targetUserName}`);
-        const metadata = await this.scrapeProfileMetadata(targetUserName);
+        await this.logger.info(`Scraping metadata for: ${targetusername}`);
+        const metadata = await this.scrapeProfileMetadata(targetusername);
         scrapingResult.metadata = metadata;
       }
 
       // Scrape posts
       if (includePosts) {
-        await this.logger.info(`Scraping posts for: ${targetUserName}`);
-        const posts = await this.scrapeUserPosts(targetUserName, maxPosts);
+        await this.logger.info(`Scraping posts for: ${targetusername}`);
+        const posts = await this.scrapeUserPosts(targetusername, maxPosts);
         scrapingResult.posts = posts;
         scrapingResult.postsCount = posts.length;
       }
 
       // Scrape followers
       if (includeFollowers) {
-        await this.logger.info(`Scraping followers for: ${targetUserName}`);
-        const followers = await this.scrapeUserFollowers(
-          targetUserName,
-          maxFollowers,
-        );
+        await this.logger.info(`Scraping followers for: ${targetusername}`);
+        const followers = await this.scrapeUserFollowers(targetusername, maxFollowers);
         scrapingResult.followers = followers;
         scrapingResult.followersCount = followers.length;
       }
 
       // Scrape followings
       if (includeFollowings) {
-        await this.logger.info(`Scraping followings for: ${targetUserName}`);
-        const followings = await this.scrapeUserFollowings(
-          targetUserName,
-          maxFollowers,
-        );
+        await this.logger.info(`Scraping followings for: ${targetusername}`);
+        const followings = await this.scrapeUserFollowings(targetusername, maxFollowers);
         scrapingResult.followings = followings;
         scrapingResult.followingsCount = followings.length;
       }
 
       // Save scraped data
-      await this.saveScrapedData(targetUserName, scrapingResult);
+      await this.saveScrapedData(targetusername, scrapingResult);
 
       // Update stats
       this.scrapingStats.profilesScraped++;
@@ -406,33 +365,27 @@ class InstaScraper {
         this.scrapingStats.followersScraped += scrapingResult.followers.length;
       }
 
-      await this.logger.info(
-        `Profile scraping completed for: ${targetUserName}`,
-        {
-          metadata: !!scrapingResult.metadata,
-          posts: scrapingResult.postsCount || 0,
-          followers: scrapingResult.followersCount || 0,
-          followings: scrapingResult.followingsCount || 0,
-        },
-      );
+      await this.logger.info(`Profile scraping completed for: ${targetusername}`, {
+        metadata: !!scrapingResult.metadata,
+        posts: scrapingResult.postsCount || 0,
+        followers: scrapingResult.followersCount || 0,
+        followings: scrapingResult.followingsCount || 0,
+      });
 
       return scrapingResult;
     } catch (error) {
-      await this.logger.error(
-        `Profile scraping failed for: ${targetUserName}`,
-        error,
-      );
+      await this.logger.error(`Profile scraping failed for: ${targetusername}`, error);
       this.scrapingStats.errors++;
       throw error;
     }
   }
 
-  // async scrapeProfileMetadata(userName) {
+  // async scrapeProfileMetadata(username) {
   //   try {
   //     // Use new scraper
-  //     const profileData = await this.scraper.scrapeProfile(userName);
+  //     const profileData = await this.scraper.scrapeProfile(username);
 
-  //     await this.logger.debug(`Metadata scraped for ${userName}`, {
+  //     await this.logger.debug(`Metadata scraped for ${username}`, {
   //       postsCount: profileData.postsCount,
   //       followersCount: profileData.followersCount,
   //       followingsCount: profileData.followingCount,
@@ -440,62 +393,52 @@ class InstaScraper {
 
   //     return profileData;
   //   } catch (error) {
-  //     await this.logger.error(`Failed to scrape metadata for: ${userName}`, error);
+  //     await this.logger.error(`Failed to scrape metadata for: ${username}`, error);
   //     throw error;
   //   }
   // }
 
-  async scrapeUserPosts(userName, maxPosts = 50) {
+  async scrapeUserPosts(username, maxPosts = 50) {
     try {
       // Use new scraper
-      const posts = await this.scraper.scrapePosts(userName, {
+      const posts = await this.scraper.scrapePosts(username, {
         limit: maxPosts,
       });
 
-      await this.logger.info(`Scraped ${posts.length} posts for ${userName}`);
+      await this.logger.info(`Scraped ${posts.length} posts for ${username}`);
       return posts;
     } catch (error) {
-      await this.logger.error(`Failed to scrape posts for: ${userName}`, error);
+      await this.logger.error(`Failed to scrape posts for: ${username}`, error);
       throw error;
     }
   }
 
-  async scrapeUserFollowers(userName, maxFollowers = 1000) {
+  async scrapeUserFollowers(username, maxFollowers = 1000) {
     try {
       // Use new scraper
-      const followers = await this.scraper.scrapeFollowers(userName, {
+      const followers = await this.scraper.scrapeFollowers(username, {
         limit: maxFollowers,
       });
 
-      await this.logger.info(
-        `Scraped ${followers.length} followers for ${userName}`,
-      );
+      await this.logger.info(`Scraped ${followers.length} followers for ${username}`);
       return followers;
     } catch (error) {
-      await this.logger.error(
-        `Failed to scrape followers for: ${userName}`,
-        error,
-      );
+      await this.logger.error(`Failed to scrape followers for: ${username}`, error);
       throw error;
     }
   }
 
-  async scrapeUserFollowings(userName, maxFollowings = 1000) {
+  async scrapeUserFollowings(username, maxFollowings = 1000) {
     try {
       // Use new scraper
-      const followings = await this.scraper.scrapeFollowing(userName, {
+      const followings = await this.scraper.scrapeFollowing(username, {
         limit: maxFollowings,
       });
 
-      await this.logger.info(
-        `Scraped ${followings.length} followings for ${userName}`,
-      );
+      await this.logger.info(`Scraped ${followings.length} followings for ${username}`);
       return followings;
     } catch (error) {
-      await this.logger.error(
-        `Failed to scrape followings for: ${userName}`,
-        error,
-      );
+      await this.logger.error(`Failed to scrape followings for: ${username}`, error);
       throw error;
     }
   }
@@ -519,10 +462,10 @@ class InstaScraper {
     }
   }
 
-  async saveScrapedData(userName, scrapedData) {
+  async saveScrapedData(username, scrapedData) {
     try {
       // Create directory structure for scraped data
-      const scrapedDataDir = `./data/instaScrapedData/${userName}`;
+      const scrapedDataDir = `./data/instaScrapedData/${username}`;
       const fs = require("fs-extra");
       await fs.ensureDir(scrapedDataDir);
 
@@ -555,38 +498,28 @@ class InstaScraper {
       const completePath = `${scrapedDataDir}/complete-${timestamp}.json`;
       await fs.writeJson(completePath, scrapedData, { spaces: 2 });
 
-      await this.logger.info(
-        `Scraped data saved for ${userName} in ${scrapedDataDir}`,
-      );
+      await this.logger.info(`Scraped data saved for ${username} in ${scrapedDataDir}`);
     } catch (error) {
-      await this.logger.error(
-        `Failed to save scraped data for: ${userName}`,
-        error,
-      );
+      await this.logger.error(`Failed to save scraped data for: ${username}`, error);
     }
   }
 
   // =============== BATCH SCRAPING ===============
-  async scrapeBatchProfiles(userNames, options = {}) {
+  async scrapeBatchProfiles(usernames, options = {}) {
     const results = [];
 
-    for (const userName of userNames) {
+    for (const username of usernames) {
       try {
-        await this.logger.info(`Starting batch scraping for: ${userName}`);
-        const result = await this.scrapeUserProfile(userName, options);
+        await this.logger.info(`Starting batch scraping for: ${username}`);
+        const result = await this.scrapeUserProfile(username, options);
         results.push(result);
 
         // Delay between users to be respectful
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.random() * 10000 + 10000),
-        );
+        await new Promise((resolve) => setTimeout(resolve, Math.random() * 10000 + 10000));
       } catch (error) {
-        await this.logger.error(
-          `Batch scraping failed for: ${userName}`,
-          error,
-        );
+        await this.logger.error(`Batch scraping failed for: ${username}`, error);
         results.push({
-          userName: userName,
+          username: username,
           success: false,
           error: error.message,
           scrapedAt: new Date().toISOString(),
@@ -596,7 +529,7 @@ class InstaScraper {
 
     return {
       success: true,
-      processedUsers: userNames.length,
+      processedUsers: usernames.length,
       results: results,
       summary: this.generateBatchSummary(results),
     };
@@ -607,16 +540,13 @@ class InstaScraper {
       totalUsers: results.length,
       successfulUsers: results.filter((r) => r.success).length,
       totalPosts: results.reduce((sum, r) => sum + (r.postsCount || 0), 0),
-      totalFollowers: results.reduce(
-        (sum, r) => sum + (r.followersCount || 0),
-        0,
-      ),
+      totalFollowers: results.reduce((sum, r) => sum + (r.followersCount || 0), 0),
       errors: results.filter((r) => !r.success).length,
     };
   }
 
   // =============== TARGET MANAGEMENT ===============
-  async addScrapingTarget(userName, targetType = "profile") {
+  async addScrapingTarget(username, targetType = "profile") {
     try {
       const fs = require("fs-extra");
       const targetsFile = "./data/instaScrapedData/targetStringsToScrape.json";
@@ -630,40 +560,36 @@ class InstaScraper {
       const targets = await fs.readJson(targetsFile);
 
       // Add new target if not already exists
-      const existingTarget = targets.find((t) => t.userName === userName);
+      const existingTarget = targets.find((t) => t.username === username);
       if (!existingTarget) {
         targets.push({
-          userName: userName,
+          username: username,
           targetType: targetType,
           addedAt: new Date().toISOString(),
           status: "pending",
         });
 
         await fs.writeJson(targetsFile, targets, { spaces: 2 });
-        await this.logger.info(`Added scraping target: ${userName}`);
+        await this.logger.info(`Added scraping target: ${username}`);
       }
 
       return true;
     } catch (error) {
-      await this.logger.error(
-        `Failed to add scraping target: ${userName}`,
-        error,
-      );
+      await this.logger.error(`Failed to add scraping target: ${username}`, error);
       throw error;
     }
   }
 
-  async markTargetAsScraped(userName) {
+  async markTargetAsScraped(username) {
     try {
       const fs = require("fs-extra");
       const targetsFile = "./data/instaScrapedData/targetStringsToScrape.json";
-      const scrapedFile =
-        "./data/instaScrapedData/targetStringsAlreadyScraped.json";
+      const scrapedFile = "./data/instaScrapedData/targetStringsAlreadyScraped.json";
 
       // Read targets
       if (await fs.pathExists(targetsFile)) {
         const targets = await fs.readJson(targetsFile);
-        const targetIndex = targets.findIndex((t) => t.userName === userName);
+        const targetIndex = targets.findIndex((t) => t.username === username);
 
         if (targetIndex !== -1) {
           const target = targets[targetIndex];
@@ -682,14 +608,11 @@ class InstaScraper {
           scrapedTargets.push(target);
           await fs.writeJson(scrapedFile, scrapedTargets, { spaces: 2 });
 
-          await this.logger.info(`Marked target as scraped: ${userName}`);
+          await this.logger.info(`Marked target as scraped: ${username}`);
         }
       }
     } catch (error) {
-      await this.logger.error(
-        `Failed to mark target as scraped: ${userName}`,
-        error,
-      );
+      await this.logger.error(`Failed to mark target as scraped: ${username}`, error);
     }
   }
 
@@ -705,12 +628,10 @@ class InstaScraper {
     this.scrapingStats.currentSession = 0;
   }
 
-  async getScrapingHistory(userName = null, days = 7) {
+  async getScrapingHistory(username = null, days = 7) {
     try {
       const fs = require("fs-extra");
-      const baseDir = userName
-        ? `./data/instaScrapedData/${userName}`
-        : "./data/instaScrapedData";
+      const baseDir = username ? `./data/instaScrapedData/${username}` : "./data/instaScrapedData";
 
       if (!(await fs.pathExists(baseDir))) {
         return [];
@@ -748,9 +669,9 @@ class InstaScraper {
       errors: [],
     };
 
-    if (!data.userName) {
+    if (!data.username) {
       validation.isValid = false;
-      validation.errors.push("Missing userName");
+      validation.errors.push("Missing username");
     }
 
     if (!data.scrapedAt) {
@@ -771,9 +692,7 @@ class InstaScraper {
 
       if (!(await fs.pathExists(scrapedDataDir))) return;
 
-      await this.logger.info(
-        `Cleaning up scraped data older than ${daysToKeep} days`,
-      );
+      await this.logger.info(`Cleaning up scraped data older than ${daysToKeep} days`);
 
       // Implement cleanup logic based on your file structure
     } catch (error) {

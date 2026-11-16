@@ -1,0 +1,93 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 16-11-26 14-29-20 =-=-=-=-=-=-
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Failed to extract profile info:
+Error: Cannot set properties of undefined (setting 'currentProfile')
+
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Failed to extract profile info:
+Error: Cannot set properties of undefined (setting 'currentProfile')
+
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:

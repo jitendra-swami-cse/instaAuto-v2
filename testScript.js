@@ -7,26 +7,18 @@ const Browser = require("./modules/CoreModules/Browser.js");
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // 👇 SET THIS to wherever you want the .webm saved.
 // You can give an absolute path or a path relative to this script.
-const VIDEO_SAVE_PATH = path.resolve(
-  __dirname,
-  "recordings",
-  "instagram-recording.webm",
-);
+const VIDEO_SAVE_PATH = path.resolve(__dirname, "recordings", "instagram-recording.webm");
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 async function recordVideo() {
   const video = document.querySelector("video");
   if (!video) throw new Error("No <video> element found on page");
 
-  const stream = video.captureStream
-    ? video.captureStream()
-    : video.mozCaptureStream();
+  const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
 
   const chunks = [];
   const recorder = new MediaRecorder(stream, {
-    mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
-      ? "video/webm;codecs=vp9,opus"
-      : "video/webm",
+    mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? "video/webm;codecs=vp9,opus" : "video/webm",
   });
 
   recorder.ondataavailable = (event) => {
@@ -58,9 +50,7 @@ async function recordVideo() {
 
   // Safety net in case "ended" never fires (e.g., live stream, paused).
   const maxDurationMs = 5 * 60 * 1000;
-  const timeout = new Promise((resolve) =>
-    setTimeout(() => resolve("timeout"), maxDurationMs),
-  );
+  const timeout = new Promise((resolve) => setTimeout(() => resolve("timeout"), maxDurationMs));
 
   video.currentTime = 0;
   await video.play();
@@ -100,9 +90,7 @@ async function main() {
   console.log("Type of recordVideo: ", typeof recordVideo);
 
   // -=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  const isVideoPresent = await page.evaluate(
-    () => !!document.querySelector("article video"),
-  );
+  const isVideoPresent = await page.evaluate(() => !!document.querySelector("article video"));
 
   if (!isVideoPresent) {
     console.log("can't Download — no video found on page.");
@@ -118,8 +106,7 @@ async function main() {
   }, recordVideo.toString());
 
   if (!dataUrl) {
-    console.log("res is can't Download");
-    console.log("Ended........");
+    console.log("Video can't Downloaded by current. Code Check n modify code.");
     return;
   }
 

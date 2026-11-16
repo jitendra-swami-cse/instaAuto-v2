@@ -46,21 +46,15 @@ class ConfigManager {
     return defaultValue;
   };
 
-  createDownloadStructure = async (userName, createDirectories = true) => {
-    if (!createDirectories) {
-      return `./downloads/${userName}`;
-    }
+  createProfileStructure = async (userName) => {
+    const profilePath = path.resolve(__dirname, "data", userName);
 
-    const basePath = `./downloads/${userName}`;
-    const datePath = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-    const downloadPath = path.join(basePath, datePath);
+    await fs.ensureDir(profilePath);
+    await fs.ensureDir(path.join(profilePath, "images"));
+    await fs.ensureDir(path.join(profilePath, "videos"));
+    await fs.ensureDir(path.join(profilePath, "carousels"));
 
-    await fs.ensureDir(downloadPath);
-    await fs.ensureDir(path.join(downloadPath, "images"));
-    await fs.ensureDir(path.join(downloadPath, "videos"));
-    await fs.ensureDir(path.join(downloadPath, "carousels"));
-
-    return downloadPath;
+    return profilePath;
   };
   //   getAccounts() {
   //   return this.accounts;
