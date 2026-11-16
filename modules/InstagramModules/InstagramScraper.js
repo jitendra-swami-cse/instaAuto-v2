@@ -231,8 +231,8 @@ class InstaScraper {
       return false;
     }
 
-    const { profilePath, username } = ConfigManager.currentProfile.profilePath;
-    const VIDEO_SAVE_PATH = path.resolve(profilePath, "video", username);
+    const { profilePath, username } = ConfigManager.currentProfile;
+    const VIDEO_SAVE_PATH = path.resolve(profilePath, "videos", `${username}-${Date.now()}.webm`);
 
     // 👇 page.evaluate now resolves only when the page's promise resolves,
     // i.e. after the recording finished and the data URL is available.
@@ -260,6 +260,8 @@ class InstaScraper {
   };
   recordVideo = async () => {
     const video = document.querySelector("video");
+    if (!video) throw new Error("No <video> element found on page");
+
     const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
 
     const chunks = [];
@@ -271,27 +273,51 @@ class InstaScraper {
       if (event.data.size) chunks.push(event.data);
     };
 
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+    // Resolve only AFTER the blob is built and converted to a base64 data URL
+    const finished = new Promise((resolve, reject) => {
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(chunks, { type: "video/webm" });
 
-      a.href = url;
-      a.download = `instagram-recording-${Date.now()}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+          const dataUrl = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onloadend = () => res(reader.result);
+            reader.onerror = rej;
+            reader.readAsDataURL(blob);
+          });
 
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      console.log("Recording saved.");
-    };
+          console.log("Recording finished in page.");
+          resolve(dataUrl);
+        } catch (err) {
+          reject(err);
+        }
+      };
+    });
+
+    // Safety net in case "ended" never fires (live stream, paused, etc.)
+    const maxDurationMs = 5 * 60 * 1000;
+    const timeout = new Promise((resolve) => setTimeout(() => resolve("timeout"), maxDurationMs));
 
     video.currentTime = 0;
     await video.play();
     recorder.start();
 
-    video.addEventListener("ended", () => recorder.stop(), { once: true });
-    return true;
+    const ended = new Promise((resolve) => {
+      video.addEventListener(
+        "ended",
+        () => {
+          if (recorder.state !== "inactive") recorder.stop();
+          resolve("ended");
+        },
+        { once: true },
+      );
+    });
+
+    await Promise.race([ended, timeout]);
+
+    if (recorder.state !== "inactive") recorder.stop();
+
+    return await finished; // <-- returns the data URL string
   };
   // -=-=-=-=-= Above this line methods are tested and working -=-=-=-=-=
 

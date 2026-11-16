@@ -47,7 +47,7 @@ class ConfigManager {
   };
 
   createProfileStructure = async (userName) => {
-    const profilePath = path.resolve(__dirname, "data", userName);
+    const profilePath = path.resolve(process.cwd(), "data", userName);
 
     await fs.ensureDir(profilePath);
     await fs.ensureDir(path.join(profilePath, "images"));

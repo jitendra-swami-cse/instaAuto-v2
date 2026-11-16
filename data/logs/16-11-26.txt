@@ -91,3 +91,86 @@ selectorString: div[role="dialog"] article
 selectorString: [aria-label="Next"] 
 selectorString: [aria-label="Next"] 
 Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to https://www.instagram.com/p/CgvdfOZlGdo/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to https://www.instagram.com/p/CgvdfOZlGdo/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Failed to scrape posts from Jitendra_goswami132:
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Video can't Downloaded by current. Code Check n modify code.
+selectorString: [aria-label="Next"] 
+Video can't Downloaded by current. Code Check n modify code.
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Video can't Downloaded by current. Code Check n modify code.
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Video can't Downloaded by current. Code Check n modify code.
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
+selectorString: [aria-label="Next"] 
