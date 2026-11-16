@@ -14,19 +14,13 @@ async function main() {
 
   // =========== Code under testing and Development ==============
   const username = "Jitendra_goswami132";
-  // await Browser.initialize(2);
-  // await Instagram.init();
-  // await Instagram.navigateToProfile(username);
+
   const profileInfo = await InstagramScraper.scrapePosts(username);
   console.log("Profile Info:", profileInfo);
 
   // =========================
   console.log("Ended........");
-
-  // If url contains "/p/" than post media is either img or carousal of imgs-
-  //       - In case of img selector is -> 'article ._aagv img'
 }
-
 main();
 
 // -=-=-=-=-=-=-=- functions tested and working -=-=-=-=-=-=-=-

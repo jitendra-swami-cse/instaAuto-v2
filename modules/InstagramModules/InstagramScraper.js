@@ -120,7 +120,7 @@ class InstaScraper {
    */
   scrapePosts = async (username, options = {}) => {
     try {
-      let { mediaTypes = ["image", "video", "carousel"], maxItems = 50, maxScrolls = 10, skipExisting = true, createDirectories = true } = options;
+      let { maxPosts = 50, skipExisting = true } = options;
 
       await Logger.logMSG(`Scraping posts from: ${username}`);
 
@@ -131,35 +131,47 @@ class InstaScraper {
       // Check if profile is private
       if (currentProfile?.isPrivate) {
         await Logger.logMSG(`Profile ${username} is private`);
-        return [];
+        return false;
       }
 
       if (currentProfile.postsCount == 0) {
         await Logger.logMSG(`Profile does have any posts to download.`);
-        return [];
+        return false;
       }
 
-      if (currentProfile.postsCount < maxItems && currentProfile.postsCount > 0) maxItems = currentProfile.postsCount;
-
-      // Click on any post to open the modal
-      // await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"]'); // Only posts
-      await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]'); // Either post or reel
+      if (currentProfile.postsCount < maxPosts && currentProfile.postsCount > 0) maxPosts = currentProfile.postsCount;
 
       const links = [];
 
-      await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
+      const capture = await this.startImageResponseCapture();
+      try {
+        // Click on any post to open the modal
+        await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]');
+        await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
-      let postDownloaded = 1;
-      let postMedia;
-      while (postDownloaded < maxItems) {
-        postMedia = await this.postMediaExtraction();
-        links.push(postMedia);
+        let postMedia;
+        let postDownloaded = 0;
+        while (postDownloaded++ < maxPosts) {
+          const media = await this.postMediaDetailsExtraction();
+          if (media.postType === "image") {
+            const ok = await this.forceFreshImageLoad(media.postLink, capture);
+            if (ok) {
+              const key = capture.keyOf(media.postLink);
+              const hit = capture.responses.get(key);
+              await this.saveCapturedImage(hit.url, hit.buf);
+              capture.responses.delete(key);
+            } else {
+              await Logger.logMSG(`Image failed to load: ${media.postLink}`);
+            }
+          } else if (media.postType === "video") {
+            await this.downloadInstagramPostVideo();
+          }
 
-        await this.downloadPostMedia(postMedia);
-
-        postDownloaded++;
-        await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"] '); // Either post or reel
-        await utils.randomDelay(2, 1);
+          await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
+          await utils.randomDelay(1, 2);
+        }
+      } finally {
+        capture.stop();
       }
       // -=-=- Testing and Development -=-=-=-
       console.log(links);
@@ -196,29 +208,48 @@ class InstaScraper {
     }
   };
 
-  postMediaExtraction = async () => {
-    const postMedia = await Browser.page.evaluate(() => {
-      if (document.querySelector("article video"))
-        return {
-          postType: "video",
-          postLink: document.querySelector("article video").src,
-        };
-      else if (document.querySelector('article [aria-label="Next"]')) return { postType: "carousel", postLink: "yet not" };
-      else if (document.querySelector("article ._aagv img"))
-        return {
-          postType: "image",
-          postLink: document.querySelector("article ._aagv img").src,
-        };
-      else return { type: false };
+  // postMediaDetailsExtraction = async () => {
+  //   const postMedia = await Browser.page.evaluate(() => {
+  //     if (document.querySelector("article video"))
+  //       return {
+  //         postType: "video",
+  //         postLink: document.querySelector("article video").src,
+  //       };
+  //     else if (document.querySelector('article [aria-label="Next"]')) return { postType: "carousel", postLink: "yet not" };
+  //     else if (document.querySelector("article ._aagv img"))
+  //       return {
+  //         postType: "image",
+  //         postLink: document.querySelector("article ._aagv img").src,
+  //       };
+  //     else return { type: false };
+  //   });
+  //   return postMedia;
+  // };
+  postMediaDetailsExtraction = async () => {
+    return await Browser.page.evaluate(() => {
+      const video = document.querySelector("article video");
+      if (video) return { postType: "video", postLink: video.currentSrc || video.src };
+
+      const carouselNext = document.querySelector('article [aria-label="Next"]');
+      // Keep your carousel branch — but note: an image post also has [aria-label="Next"] for the *post* nav,
+      // so make sure this selector is scoped inside the article, not the whole dialog.
+      // (see note below)
+
+      const img = [...document.querySelectorAll("article img")]
+        .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
+        .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)[0];
+
+      if (img) return { postType: "image", postLink: img.currentSrc || img.src };
+
+      return { postType: false };
     });
-    return postMedia;
   };
 
   downloadPostMedia = async (postMedia) => {
     // Post must be open on page in selector "article"
     const { postType, postLink } = postMedia;
 
-    if (postMedia.postType === "video") await this.downloadInstagramPostVideo();
+    if (postType === "video") await this.downloadInstagramPostVideo();
     console.log(`Post Downloaded`);
   };
 
@@ -232,7 +263,7 @@ class InstaScraper {
     }
 
     const { profilePath, username } = ConfigManager.currentProfile;
-    const VIDEO_SAVE_PATH = path.resolve(profilePath, "videos", `${username}-${Date.now()}.webm`);
+    const videoSavePath = path.resolve(profilePath, "videos", `${username}-${Date.now()}.webm`);
 
     // 👇 page.evaluate now resolves only when the page's promise resolves,
     // i.e. after the recording finished and the data URL is available.
@@ -250,14 +281,15 @@ class InstaScraper {
     const base64 = dataUrl.split(",")[1];
     const buffer = Buffer.from(base64, "base64");
 
-    await fs.mkdir(path.dirname(VIDEO_SAVE_PATH), { recursive: true });
-    await fs.writeFile(VIDEO_SAVE_PATH, buffer);
+    await fs.mkdir(path.dirname(videoSavePath), { recursive: true });
+    await fs.writeFile(videoSavePath, buffer);
 
-    console.log(`Video recording is Done. Saved to: ${VIDEO_SAVE_PATH}`);
+    console.log(`Video recording is Done. Saved to: ${videoSavePath}`);
     console.log(`File size: ${buffer.length / 1024 / 1024} MB`);
 
     console.log("Ended........");
   };
+
   recordVideo = async () => {
     const video = document.querySelector("video");
     if (!video) throw new Error("No <video> element found on page");
@@ -318,6 +350,84 @@ class InstaScraper {
     if (recorder.state !== "inactive") recorder.stop();
 
     return await finished; // <-- returns the data URL string
+  };
+
+  startImageResponseCapture = async () => {
+    const responses = new Map();
+    const keyOf = (url) => {
+      try {
+        const u = new URL(url);
+        return `${u.hostname}${u.pathname}`;
+      } catch {
+        return null;
+      }
+    };
+
+    const remove = await Browser.EnhancedPage.addResponseListener(
+      (_req, res) => {
+        if (res.request().resourceType() !== "image") return false;
+        const host = new URL(res.url()).hostname;
+        return host.endsWith("cdninstagram.com") || host.endsWith("fbcdn.net");
+      },
+      async (_req, res) => {
+        try {
+          const buf = await res.buffer();
+          if (!buf?.length) return;
+          responses.set(keyOf(res.url()), { buf, url: res.url() });
+        } catch {}
+      },
+    );
+
+    return {
+      responses,
+      keyOf,
+      stop: () => {
+        remove();
+        responses.clear();
+      },
+    };
+  };
+
+  saveCapturedImage = async (src, buf) => {
+    if (!buf?.length) return false;
+    if (buf.length > this.maxFileSize) {
+      await Logger.logMSG(`Image too large: ${buf.length}`);
+      return false;
+    }
+
+    const ext = (new URL(src).pathname.match(/\.(jpe?g|png|webp|heic)$/i) || [, "jpg"])[1].toLowerCase();
+    const { profilePath, username } = ConfigManager.currentProfile;
+    const imageSavePath = path.resolve(profilePath, "images", `${username}-${Date.now()}.${ext}`);
+
+    await fs.mkdir(path.dirname(imageSavePath), { recursive: true });
+    await fs.writeFile(imageSavePath, buf);
+    await Logger.logMSG(`Image saved: ${imageSavePath} (${(buf.length / 1024).toFixed(1)} KB)`);
+    return imageSavePath;
+  };
+
+  forceFreshImageLoad = async (src, capture, timeoutMs = 15000) => {
+    const key = capture.keyOf(src);
+    if (!key) return false;
+
+    // If we already have it, no need to refetch.
+    if (capture.responses.has(key)) return true;
+
+    // Append a cache-buster so Chrome issues a real network request.
+    await Browser.page.evaluate((src) => {
+      const img = [...document.querySelectorAll("article img")].find((i) => (i.currentSrc || i.src) === src);
+      if (!img) return;
+      const u = new URL(src);
+      u.searchParams.set("_t", Date.now());
+      img.src = u.toString();
+    }, src);
+
+    // Poll the map until the response arrives (or timeout).
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      if (capture.responses.has(key)) return true;
+      await utils.randomDelay(0.2);
+    }
+    return false;
   };
   // -=-=-=-=-= Above this line methods are tested and working -=-=-=-=-=
 
