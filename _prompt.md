@@ -1928,3 +1928,7 @@ class InstaScraper {
 
 module.exports = new InstaScraper();
 ```
+
+Still needs some debugging - first carousels must be downloaded in folder carousel (i.e. ./data/username/carousel)
+second one less item of carousel gets downloaded means if there are 3 images in carousel then current script downloads only 2 images
+third - about index suffix should be only for carousels not for videos and single image posts.
