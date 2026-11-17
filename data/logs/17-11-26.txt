@@ -67,3 +67,30 @@ Carousel CKCQwgLhY63: Next button gone before slide 3; stopping
 selectorString: [aria-label="Next"]
 Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CHskJYnBvpy.jpg (43.9 KB)
 selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: E:\Projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.

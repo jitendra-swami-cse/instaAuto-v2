@@ -1932,3 +1932,17 @@ module.exports = new InstaScraper();
 Still needs some debugging - first carousels must be downloaded in folder carousel (i.e. ./data/username/carousel)
 second one less item of carousel gets downloaded means if there are 3 images in carousel then current script downloads only 2 images
 third - about index suffix should be only for carousels not for videos and single image posts.
+
+Let me give you some url strings and i want you to give me a function or regress express which extracts and returns "postCode" from url (part string after "/p/" and before next"/") and img_index if exists, the url strings are as below->
+'https://www.instagram.com/p/CwB-tVwREKJ/'
+'https://www.instagram.com/p/CgvgvLPL8G5/?img_index=1'
+'https://www.instagram.com/p/CgvgvLPL8G5/?img_index=2'
+'https://www.instagram.com/p/CgvdfOZlGdo/'
+give most optimized and shortest possible code
+
+```javascript
+const extractPostInfo = (url) => ({
+  postCode: url.split("/p/")[1].split("/")[0],
+  img_index: url.match(/[?&]img_index=(\d+)/)?.[1] || null,
+});
+```
