@@ -1459,3 +1459,472 @@ Random Delay for 250ms.
 selectorString: [aria-label="Next"]
 Random Delay for 1300ms.
 Missed response (cache hit?): https://instagram.fjai2-6.fna.fbcdn.net/v/t51.82787-15/622737623_18076186820065459_4101765346558433203_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=106&_nc_map=urlgen_bucketless&ig_cache_key=MjgwMzU5Nzg2NDMzNDEwMDY1Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkZFRUQueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=Z8oFnd-3fNoQ7kNvwEM1gFh&_nc_oc=AdrQkxZI1WFNTptvQ5lFAPNTFKAbEFWOXW-9I3cnZP7lE1krHOxvUQSdzmKJOcOtW-g&_nc_zt=23&_nc_ht=instagram.fjai2-6.fna&_nc_gid=72aB8D3hoTXUrpw6JKKMSQ&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQRjgvikqWaHnB8_BPz3wdIe1N-Ln6D8YpCrrrUlgXu9jg&oe=6B00FFF8
+
+<!-- =================================== -->
+
+you just confused me a lot now let me give you my current state of script i have already done some changes as you said and some are remaining let me give you complete script and you give me complete updated modified most optimized, refactored script with less short and that must working ok . Be careful while coding and in the end before giving script back to me please check once than give me. My current state of script is as ->
+
+```javascript
+const fs = require("fs-extra");
+const Browser = require("../CoreModules/Browser.js");
+const ConfigManager = require("../CoreModules/ConfigManager.js");
+const Logger = require("../CoreModules/Logger.js");
+const EnhancedPage = require("../CoreModules/EnhancedPage.js");
+const Instagram = require("./Instagram.js");
+const utils = require("../../utils/utils.js");
+const path = require("path");
+
+class InstaScraper {
+  constructor() {
+    // Configuration properties
+    this.maxFileSize = 100 * 1024 * 1024; // 100MB
+    this.supportedMediaTypes = ["image", "video", "carousel"];
+  }
+
+  /**
+   * Extract profile information from current page
+   * NOTE - This Work only when windowSize is = [815, 789] and screen zoom is 90% .
+   * @param {Object} page - Puppeteer page instance
+   * @returns {Object} Profile data
+   */
+  scrapeProfileMetadata = async (username) => {
+    try {
+      if (username) await Instagram.navigateToProfile(username);
+
+      const profileMetaData = await Browser.page.evaluate(() => {
+        // Extract profile data
+        // const fullName = document.querySelector("h1").textContent.trim();
+        const username = document.querySelector("h2").textContent.trim();
+
+        const contentMeta = document.querySelectorAll('meta[name="description"]')[0]?.content;
+        const bio = contentMeta?.split("Instagram:")[1]?.trim();
+
+        // Extract counts
+        const followersCountText = contentMeta.substring(0, contentMeta.indexOf("Followers")).trim();
+        const followingCountText = contentMeta.split("Followers,")[1].split("Following")[0].trim();
+        const postsCountText = contentMeta.split("Following,")[1].split("Posts")[0].trim();
+
+        const profilePicUrl = document.querySelectorAll(`a[href="/${username}/"] img`)[0].src;
+
+        // Parse counts (handle K, M suffixes)
+        const parseCount = (text) => {
+          if (!text) return 0;
+          const cleanText = text.replace(/,/g, "");
+          if (cleanText.includes("K")) {
+            return Math.floor(parseFloat(cleanText) * 1000);
+          } else if (cleanText.includes("M")) {
+            return Math.floor(parseFloat(cleanText) * 1000000);
+          }
+          return parseInt(cleanText) || 0;
+        };
+
+        return {
+          username: username.replace("@", ""),
+          bio,
+          profilePicUrl,
+          postsCount: parseCount(postsCountText),
+          followersCount: parseCount(followersCountText),
+          followingCount: parseCount(followingCountText),
+          isPrivate: !![document.body].find((element) => element.textContent?.toLowerCase().includes("profile is private")),
+          isVerified: !!document.querySelector('svg[aria-label="Verified"]'),
+          scrapedAt: new Date().toISOString(),
+        };
+      });
+
+      ConfigManager.currentProfile = profileMetaData;
+
+      // Create Profile directory structure
+      ConfigManager.currentProfile.profilePath = await ConfigManager.createProfileStructure(username);
+
+      await fs.writeJson(`${ConfigManager.currentProfile.profilePath}/${username}.json`, ConfigManager.currentProfile, { spaces: 2 });
+
+      return ConfigManager.currentProfile;
+    } catch (error) {
+      await Logger.logError("Failed to extract profile info:", error);
+      return null;
+    }
+  };
+
+  /**
+   * Scrape posts from a profile
+   * @param {string} username - Target username
+   * @param {Object} options - Scraping options
+   * @returns {Array} Array of post data
+   */
+  scrapePosts = async (username, options = {}) => {
+    try {
+      let { maxPosts = 50, skipExisting = true } = options;
+
+      await Logger.logMSG(`Scraping posts from: ${username}`);
+
+      await Instagram.navigateToProfile(username);
+
+      const currentProfile = await this.scrapeProfileMetadata(username);
+
+      // Check if profile is private
+      if (currentProfile?.isPrivate) {
+        await Logger.logMSG(`Profile ${username} is private`);
+        return false;
+      }
+
+      if (currentProfile.postsCount == 0) {
+        await Logger.logMSG(`Profile does have any posts to download.`);
+        return false;
+      }
+
+      if (currentProfile.postsCount < maxPosts && currentProfile.postsCount > 0) maxPosts = currentProfile.postsCount;
+
+      const links = [];
+
+      const capture = await this.startImageResponseCapture();
+      try {
+        await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]');
+        await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
+
+        let i = 0;
+        while (i++ < maxPosts) {
+          const items = await this.postMediaDetailsExtraction();
+
+          if (items.length === 0) {
+            await Logger.logMSG(`No media detected on post ${i}`);
+          } else if (items.length === 1 && items[0].postType === "image") {
+            // Single image
+            const ok = await this.forceFreshImageLoad(items[0].postLink, capture);
+            if (ok) {
+              const hit = capture.responses.get(capture.keyOf(items[0].postLink));
+              await this.saveCapturedImage(hit.url, hit.buf);
+              capture.responses.delete(capture.keyOf(items[0].postLink));
+            }
+          } else if (items.length === 1 && items[0].postType === "video") {
+            await this.downloadInstagramPostVideo();
+          } else {
+            // Carousel (2+ items, may include mixed image/video)
+            await this.downloadCarousel(items, capture);
+          }
+
+          // Click the OUTER Next (next post), not the carousel arrow.
+          // After the carousel finishes, the carousel arrow is hidden (last slide),
+          // so a plain [aria-label="Next"] click hits the outer nav.
+          await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
+          await utils.randomDelay(1, 2);
+        }
+      } finally {
+        capture.stop();
+      }
+      // -=-=- Testing and Development -=-=-=-
+      console.log(links);
+      // // Scroll to load posts
+      // await scrollToLoadMore(Browser.page, scrolls, "article a");
+
+      // // Extract post data
+      // const posts = await Browser.page.evaluate((limit) => {
+      //   const postLinks = Array.from(document.querySelectorAll("article a"));
+      //   const posts = [];
+
+      //   for (let i = 0; i < Math.min(postLinks.length, limit); i++) {
+      //     const link = postLinks[i];
+      //     const img = link.querySelector("img");
+
+      //     if (img) {
+      //       posts.push({
+      //         url: link.href,
+      //         imageUrl: img.src,
+      //         alt: img.alt || "",
+      //         scrapedAt: new Date().toISOString(),
+      //       });
+      //     }
+      //   }
+
+      //   return posts;
+      // }, limit);
+
+      // await Logger.logMSG(`Scraped ${posts.length} posts from ${username}`);
+      // return posts;
+    } catch (error) {
+      await Logger.logMSG(`Failed to scrape posts from ${username}:`, error);
+      throw error;
+    }
+  };
+
+  // postMediaDetailsExtraction = async () => {
+  //   const postMedia = await Browser.page.evaluate(() => {
+  //     if (document.querySelector("article video"))
+  //       return {
+  //         postType: "video",
+  //         postLink: document.querySelector("article video").src,
+  //       };
+  //     else if (document.querySelector('article [aria-label="Next"]')) return { postType: "carousel", postLink: "yet not" };
+  //     else if (document.querySelector("article ._aagv img"))
+  //       return {
+  //         postType: "image",
+  //         postLink: document.querySelector("article ._aagv img").src,
+  //       };
+  //     else return { type: false };
+  //   });
+  //   return postMedia;
+  // };
+  postMediaDetailsExtraction = async () => {
+    return await Browser.page.evaluate(() => {
+      const dialog = document.querySelector('div[role="dialog"]');
+      const article = dialog?.querySelector("article");
+      if (!article) return { shortcode: null, items: [] };
+
+      // Shortcode from any permalink inside the dialog.
+      const permalink = dialog.querySelector('a[href*="/p/"], a[href*="/reel/"]');
+      const shortcode = permalink?.getAttribute("href")?.match(/\/(?:p|reel)\/([^/?#]+)/)?.[1] || null;
+
+      const items = [];
+
+      // Carousel: <ul> with one <li> per slide.
+      const carouselUl = article.querySelector("ul");
+      const slides = carouselUl ? [...carouselUl.querySelectorAll(":scope > li")] : [];
+
+      if (slides.length > 1) {
+        for (const li of slides) {
+          const video = li.querySelector("video");
+          if (video) {
+            items.push({ postType: "video", postLink: video.currentSrc || video.src });
+            continue;
+          }
+          const img = li.querySelector('img[src*="cdninstagram"], img[src*="fbcdn"]');
+          if (img) items.push({ postType: "image", postLink: img.currentSrc || img.src });
+        }
+        return { shortcode, items };
+      }
+
+      // Single video.
+      const video = article.querySelector("video");
+      if (video) return { shortcode, items: [{ postType: "video", postLink: video.currentSrc || video.src }] };
+
+      // Single image — biggest real image, skip the 41×41 profile pic.
+      const img = [...article.querySelectorAll('img[src*="cdninstagram"], img[src*="fbcdn"]')]
+        .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
+        .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)[0];
+
+      if (img) items.push({ postType: "image", postLink: img.currentSrc || img.src });
+
+      return { shortcode, items };
+    });
+  };
+
+  downloadPostMedia = async (postMedia) => {
+    // Post must be open on page in selector "article"
+    const { postType, postLink } = postMedia;
+
+    if (postType === "video") await this.downloadInstagramPostVideo();
+    console.log(`Post Downloaded`);
+  };
+
+  downloadInstagramPostVideo = async () => {
+    const page = Browser.page;
+    const isVideoPresent = await page.evaluate(() => !!document.querySelector("article video"));
+
+    if (!isVideoPresent) {
+      Logger.logMSG("can't Download — no video found on page.");
+      return false;
+    }
+
+    const { profilePath, username } = ConfigManager.currentProfile;
+    const videoSavePath = path.resolve(profilePath, "videos", `${username}-${Date.now()}.webm`);
+
+    // 👇 page.evaluate now resolves only when the page's promise resolves,
+    // i.e. after the recording finished and the data URL is available.
+    const dataUrl = await page.evaluate(async (fnSource) => {
+      const recordVideo = new Function(`return (${fnSource})`)();
+      return await recordVideo();
+    }, this.recordVideo.toString());
+
+    if (!dataUrl) {
+      Logger.logMSG("Video can't Downloaded by current. Code Check n modify code.");
+      return false;
+    }
+
+    // Strip the "data:video/webm;base64," prefix and write to disk.
+    const base64 = dataUrl.split(",")[1];
+    const buffer = Buffer.from(base64, "base64");
+
+    await fs.mkdir(path.dirname(videoSavePath), { recursive: true });
+    await fs.writeFile(videoSavePath, buffer);
+
+    console.log(`Video recording is Done. Saved to: ${videoSavePath}`);
+    console.log(`File size: ${buffer.length / 1024 / 1024} MB`);
+
+    console.log("Ended........");
+  };
+
+  recordVideo = async () => {
+    const video = document.querySelector("video");
+    if (!video) throw new Error("No <video> element found on page");
+
+    const stream = video.captureStream ? video.captureStream() : video.mozCaptureStream();
+
+    const chunks = [];
+    const recorder = new MediaRecorder(stream, {
+      mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus") ? "video/webm;codecs=vp9,opus" : "video/webm",
+    });
+
+    recorder.ondataavailable = (event) => {
+      if (event.data.size) chunks.push(event.data);
+    };
+
+    // Resolve only AFTER the blob is built and converted to a base64 data URL
+    const finished = new Promise((resolve, reject) => {
+      recorder.onstop = async () => {
+        try {
+          const blob = new Blob(chunks, { type: "video/webm" });
+
+          const dataUrl = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onloadend = () => res(reader.result);
+            reader.onerror = rej;
+            reader.readAsDataURL(blob);
+          });
+
+          console.log("Recording finished in page.");
+          resolve(dataUrl);
+        } catch (err) {
+          reject(err);
+        }
+      };
+    });
+
+    // Safety net in case "ended" never fires (live stream, paused, etc.)
+    const maxDurationMs = 5 * 60 * 1000;
+    const timeout = new Promise((resolve) => setTimeout(() => resolve("timeout"), maxDurationMs));
+
+    video.currentTime = 0;
+    await video.play();
+    recorder.start();
+
+    const ended = new Promise((resolve) => {
+      video.addEventListener(
+        "ended",
+        () => {
+          if (recorder.state !== "inactive") recorder.stop();
+          resolve("ended");
+        },
+        { once: true },
+      );
+    });
+
+    await Promise.race([ended, timeout]);
+
+    if (recorder.state !== "inactive") recorder.stop();
+
+    return await finished; // <-- returns the data URL string
+  };
+
+  startImageResponseCapture = async () => {
+    const responses = new Map();
+    const keyOf = (url) => {
+      try {
+        const u = new URL(url);
+        return `${u.hostname}${u.pathname}`;
+      } catch {
+        return null;
+      }
+    };
+
+    const remove = await Browser.EnhancedPage.addResponseListener(
+      (_req, res) => {
+        if (res.request().resourceType() !== "image") return false;
+        const host = new URL(res.url()).hostname;
+        return host.endsWith("cdninstagram.com") || host.endsWith("fbcdn.net");
+      },
+      async (_req, res) => {
+        try {
+          const buf = await res.buffer();
+          if (!buf?.length) return;
+          responses.set(keyOf(res.url()), { buf, url: res.url() });
+        } catch {}
+      },
+    );
+
+    return {
+      responses,
+      keyOf,
+      stop: () => {
+        remove();
+        responses.clear();
+      },
+    };
+  };
+
+  saveCapturedImage = async (src, buf, baseName) => {
+    if (!buf?.length) return false;
+    if (buf.length > this.maxFileSize) {
+      await Logger.logMSG(`Image too large: ${buf.length}`);
+      return false;
+    }
+
+    const ext = (new URL(src).pathname.match(/\.(jpe?g|png|webp|heic)$/i) || [, "jpg"])[1].toLowerCase();
+    const { profilePath, username } = ConfigManager.currentProfile;
+    const imageSavePath = path.resolve(profilePath, "images", `${username}-${baseName}.${ext}`);
+
+    // Idempotency: skip if already downloaded on a previous run.
+    if (await fs.pathExists(imageSavePath)) {
+      await Logger.logMSG(`Already exists, skipping: ${imageSavePath}`);
+      return imageSavePath;
+    }
+
+    await fs.mkdir(path.dirname(imageSavePath), { recursive: true });
+    await fs.writeFile(imageSavePath, buf);
+    await Logger.logMSG(`Image saved: ${imageSavePath} (${(buf.length / 1024).toFixed(1)} KB)`);
+    return imageSavePath;
+  };
+
+  forceFreshImageLoad = async (src, capture, timeoutMs = 15000) => {
+    const key = capture.keyOf(src);
+    if (!key) return false;
+    if (capture.responses.has(key)) return true;
+
+    await Browser.page.evaluate((src) => {
+      const img = [...document.querySelectorAll('div[role="dialog"] article img')].find((i) => (i.currentSrc || i.src) === src);
+      if (!img) return;
+      const u = new URL(src);
+      u.searchParams.set("_t", Date.now());
+      img.src = u.toString();
+    }, src);
+
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      if (capture.responses.has(key)) return true;
+      await utils.randomDelay(0.2);
+    }
+    return false;
+  };
+  downloadCarousel = async (items, capture) => {
+    const saved = [];
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      // Make sure the current slide is visible + loaded.
+      if (i > 0) {
+        await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
+        await utils.randomDelay(0.3, 0.6);
+      }
+
+      if (item.postType === "image") {
+        const ok = await this.forceFreshImageLoad(item.postLink, capture);
+        if (ok) {
+          const hit = capture.responses.get(capture.keyOf(item.postLink));
+          const path = await this.saveCapturedImage(hit.url, hit.buf);
+          if (path) saved.push(path);
+          capture.responses.delete(capture.keyOf(item.postLink));
+        } else {
+          await Logger.logMSG(`Slide ${i + 1} image not captured: ${item.postLink}`);
+        }
+      } else if (item.postType === "video") {
+        // Re-use your existing recorder. The current slide's video is already playing.
+        const path = await this.downloadInstagramPostVideo();
+        if (path) saved.push(path);
+      }
+    }
+
+    return saved;
+  };
+}
+
+module.exports = new InstaScraper();
+```

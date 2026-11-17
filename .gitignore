@@ -2,3 +2,7 @@ node_modules
 profiles
 currentWS.txt
 *.webm
+*carousels
+*images
+*videos
+
