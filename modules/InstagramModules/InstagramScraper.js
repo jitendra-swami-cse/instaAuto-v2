@@ -78,7 +78,6 @@ class InstaScraper {
         await Logger.logMSG(`Profile ${username} has no posts to download.`);
         return false;
       }
-
       if (currentProfile.postsCount < maxPosts) maxPosts = currentProfile.postsCount;
 
       const capture = await this.startImageResponseCapture();
@@ -88,17 +87,17 @@ class InstaScraper {
 
         let postDownloaded = 0;
         while (postDownloaded < maxPosts) {
-          const { postType, postLink } = await this.postMediaDetailsExtraction();
+          const postMediaDetails = await this.postMediaDetailsExtraction();
 
-          if (items.length === 1) {
-            // Single post — no index suffix, into images/ (or videos/)
-            await this.downloadOneItem(items[0], capture, shortcode, "images");
+          if (!postMediaDetails.isCarouselPost) {
+            await this.downloadPostMedia(postMediaDetails, capture);
           } else {
-            await this.downloadCarousel(shortcode, items, capture);
+            await this.downloadCarousel(capture); // ← AWAITED (was fire-and-forget)
           }
 
           await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
-          console.log(`Posts downloaded are : ${postDownloaded}`);
+          postDownloaded++;
+          console.log(`Posts downloaded: ${postDownloaded}`);
           await utils.randomDelay(1, 2);
         }
       } finally {
@@ -111,96 +110,101 @@ class InstaScraper {
     console.log("All Posts scraping Done.");
   };
 
+  /* ────────────────────────────── Download: carousel ────────────────────────────── */
+
+  downloadCarousel = async (capture) => {
+    let index = 1;
+    const downloadedSlidesURL = [];
+    while (true) {
+      const slidesDetails = await Browser.page.evaluate(() => {
+        [...document.querySelectorAll('div[role="dialog"] article ._aagv img')]
+          .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
+          .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight);
+      });
+      details.imgIndex = index; // force 1-based, independent of URL state
+
+      await this.downloadPostMedia(details, capture);
+
+      const hasNext = await Browser.page.evaluate(() => !!document.querySelector('article button[aria-label="Next"]'));
+      if (!hasNext) break;
+
+      await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
+      await Browser.EnhancedPage.waitForPageLoad();
+
+      index++;
+      console.log(`Carousel slide index: ${index}`);
+    }
+
+    console.log(`Carousel done: ${index} slides processed`);
+  };
+
   /* ────────────────────────────── Extraction ────────────────────────────── */
 
   postMediaDetailsExtraction = async () => {
     return await Browser.page.evaluate(() => {
-      const article = document.querySelector('div[role="dialog"] article');
+      const imgLinks = [...document.querySelectorAll('div[role="dialog"] article ._aagv img')]
+        .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
+        .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)
+        .map((el) => el.src);
+      const imgDetails = imgLinks.map((imgLink) => ({ postType: "image", postLink: imgLink }));
+      const videoLinks = [...document.querySelectorAll('div[role="dialog"] article video')].map((vidEl) => vidEl.src);
+      const vidsDetails = videoLinks.map((vidlink) => ({ postType: "video", postLink: vidlink }));
+      const postMediaDetails = [...imgDetails, ...vidsDetails];
 
-      const isCarouselPost = !!article.querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
-      if (isCarouselPost) return { postType: "carousel", postLink: false };
-      else {
-        const videoPost = article.querySelector("video");
-        if (videoPost) return { postType: "video", postLink: videoPost.currentSrc || videoPost.src };
+      const url = document.URL;
+      const postCode = url.split("/p/")[1]?.split("/")[0] || url.split("/reel/")[1]?.split("/")[0] || null;
+      const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
 
-        const imagePost = [...article.querySelectorAll('img[src*="cdninstagram"], img[src*="fbcdn"]')]
-          .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
-          .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)[0];
+      let isCarouselPost = !!document.querySelector('div[aria-modal="true"][role="dialog"] article').querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
 
-        return { postType: "image", postLink: imagePost.currentSrc || imagePost.src };
-      }
+      postMediaDetails.map((obj) => ({ postCode, imgIndex, isCarouselPost, ...obj }));
+      return postMediaDetails;
     });
   };
 
   /* ────────────────────────────── Download: one item ────────────────────────────── */
 
-  downloadOneItem = async (item, capture, baseName, folder = "images") => {
-    if (item.postType === "image") {
-      let src = item.postLink;
+  downloadPostMedia = async (postMediaDetails, capture) => {
+    // Image
+    if (postMediaDetails.postType === "image") {
+      const src = postMediaDetails.postLink;
+      if (!src) {
+        await Logger.logMSG(`No image src (${postMediaDetails.postCode})`);
+        return false;
+      }
+
       await this.forceFreshImageLoad(src, capture);
-      const key = capture.keyOf(src);
-      const hit = capture.responses.get(key);
-      const saved = await this.saveCapturedImage(hit.url, hit.buf, baseName, folder);
-      capture.responses.delete(key);
+
+      const pathname = new URL(src).pathname;
+      const hit = capture.responses.get(pathname);
+      if (!hit) {
+        await Logger.logMSG(`Response missing for ${src}`);
+        return false;
+      }
+
+      const saved = await this.saveCapturedImage(hit.url, hit.buf, postMediaDetails.postCode, postMediaDetails.imgIndex);
+      capture.responses.delete(pathname);
       return saved;
     }
 
-    if (item.postType === "video") await this.downloadInstagramPostVideo();
+    // Video
+    if (postMediaDetails.postType === "video") {
+      await this.downloadInstagramPostVideo();
+    }
 
     return false;
-  };
-
-  /* ────────────────────────────── Download: carousel ────────────────────────────── */
-
-  downloadCarousel = async (shortcode, items, capture) => {
-    const saved = [];
-
-    for (let i = 0; i < items.length; i++) {
-      // Navigate to slide i. Slide 0 is already visible.
-      if (i > 0) {
-        const hasNext = await Browser.page.evaluate(() => !!document.querySelector('article button[aria-label="Next"]'));
-        if (!hasNext) {
-          await Logger.logMSG(`Carousel ${shortcode}: Next button gone before slide ${i + 1}; stopping`);
-          break;
-        }
-        await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
-        await utils.randomDelay(0.4, 0.8);
-      }
-
-      // Re-read the current slide's src AFTER navigation — this is the key fix
-      // for slide 1: we want the src that matches what is currently loaded.
-      const currentSrc = await Browser.page.evaluate((idx) => {
-        const article = document.querySelector('div[role="dialog"] article');
-        const carouselUl = article?.querySelector("ul");
-        const slides = carouselUl ? [...carouselUl.querySelectorAll(":scope > li")] : [];
-        const li = slides[idx];
-        if (!li) return null;
-        const video = li.querySelector("video");
-        if (video) return { type: "video", src: video.currentSrc || video.src };
-        const img = li.querySelector('img[src*="cdninstagram"], img[src*="fbcdn"]');
-        return img ? { type: "image", src: img.currentSrc || img.src } : null;
-      }, i);
-
-      if (!currentSrc?.src) {
-        await Logger.logMSG(`Carousel ${shortcode} slide ${i + 1}: no src found, skipping`);
-        continue;
-      }
-
-      const itemToDownload = { postType: currentSrc.type, postLink: currentSrc.src, slideIndex: i };
-      const p = await this.downloadOneItem(itemToDownload, capture, `${shortcode}-${i + 1}`, "carousels");
-      if (p) saved.push(p);
-    }
-    return saved;
   };
 
   /* ────────────────────────────── Image capture plumbing ────────────────────────────── */
 
   startImageResponseCapture = async () => {
     const responses = new Map();
+
+    // Key by pathname only — Instagram rotates CDN hostnames (fjai2-4 → fjai2-6),
+    // so hostname+pathname is too strict. Pathname is unique per image.
     const keyOf = (url) => {
       try {
-        const u = new URL(url);
-        return `${u.hostname}${u.pathname}`;
+        return new URL(url).pathname;
       } catch {
         return null;
       }
@@ -231,7 +235,7 @@ class InstaScraper {
     };
   };
 
-  saveCapturedImage = async (src, buf, baseName, folder = "images") => {
+  saveCapturedImage = async (src, buf, postCode, imgIndex) => {
     if (!buf?.length) return false;
     if (buf.length > this.maxFileSize) {
       await Logger.logMSG(`Image too large: ${buf.length}`);
@@ -240,7 +244,8 @@ class InstaScraper {
 
     const ext = (new URL(src).pathname.match(/\.(jpe?g|png|webp|heic)$/i) || [, "jpg"])[1].toLowerCase();
     const { profilePath, username } = ConfigManager.currentProfile;
-    const imageSavePath = path.resolve(profilePath, folder, `${username}-${baseName}.${ext}`);
+
+    const imageSavePath = imgIndex ? path.resolve(profilePath, "carousels", `${username}-${postCode}-${imgIndex}.${ext}`) : path.resolve(profilePath, "images", `${username}-${postCode}.${ext}`);
 
     if (await fs.pathExists(imageSavePath)) {
       await Logger.logMSG(`Already exists, skipping: ${imageSavePath}`);
@@ -253,15 +258,13 @@ class InstaScraper {
     return imageSavePath;
   };
 
-  forceFreshImageLoad = async (src, capture, timeoutMs = 15000) => {
+  forceFreshImageLoad = async (src, capture, timeoutMs = 30000) => {
     const key = capture.keyOf(src);
     if (!key) return false;
     if (capture.responses.has(key)) return true;
 
-    const targetPathname = new URL(src).pathname;
-
     await Browser.page.evaluate((pathname) => {
-      // Match by pathname so we tolerate query-string / currentSrc differences.
+      // Match by pathname to tolerate query-string / currentSrc differences.
       const imgs = [...document.querySelectorAll('div[role="dialog"] article img')];
       const targets = imgs.filter((img) => {
         try {
@@ -275,16 +278,12 @@ class InstaScraper {
         u.searchParams.set("_t", Date.now());
         img.src = u.toString();
       }
-    }, targetPathname);
+    }, key);
 
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       if (capture.responses.has(key)) return true;
-      // Fallback: any entry whose key ends with the pathname is acceptable.
-      for (const k of capture.responses.keys()) {
-        if (k.endsWith(targetPathname)) return true;
-      }
-      await utils.randomDelay(0.2);
+      await new Promise((resolve) => setTimeout(resolve, 800));
     }
     return false;
   };
