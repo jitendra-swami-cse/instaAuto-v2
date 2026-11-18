@@ -89,10 +89,10 @@ class InstaScraper {
         while (postDownloaded < maxPosts) {
           const postMediaDetails = await this.postMediaDetailsExtraction();
 
-          if (!postMediaDetails.isCarouselPost) {
-            await this.downloadPostMedia(postMediaDetails, capture);
+          if (!postMediaDetails[0].isCarouselPost) {
+            await this.downloadPostMedia(postMediaDetails[0], capture);
           } else {
-            await this.downloadCarousel(capture); // ← AWAITED (was fire-and-forget)
+            await this.downloadCarousel(postMediaDetails, capture);
           }
 
           await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
@@ -112,24 +112,25 @@ class InstaScraper {
 
   /* ────────────────────────────── Download: carousel ────────────────────────────── */
 
-  downloadCarousel = async (capture) => {
+  downloadCarousel = async (postMediaDetailsArray, capture) => {
     let index = 1;
-    const downloadedSlidesURL = [];
     while (true) {
-      const slidesDetails = await Browser.page.evaluate(() => {
-        [...document.querySelectorAll('div[role="dialog"] article ._aagv img')]
-          .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
-          .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight);
-      });
-      details.imgIndex = index; // force 1-based, independent of URL state
+      postMediaDetailsArray = postMediaDetailsArray.map((obj, i) => ({ imgIndex: i + 1, ...obj }));
+      for (const postMediaDetails of postMediaDetailsArray) {
+        if (!postMediaDetails.savePath) postMediaDetails.savePath = await this.downloadPostMedia(postMediaDetails, capture);
+      }
 
-      await this.downloadPostMedia(details, capture);
-
-      const hasNext = await Browser.page.evaluate(() => !!document.querySelector('article button[aria-label="Next"]'));
+      const hasNext = await Browser.page.evaluate(() => !!document.querySelector('div[role="dialog"] article button[aria-label="Next"]'));
       if (!hasNext) break;
 
       await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
       await Browser.EnhancedPage.waitForPageLoad();
+
+      const newPostMediaDetailsArray = await this.postMediaDetailsExtraction();
+      newPostMediaDetailsArray.forEach((newPostMediaDetails) => {
+        const flagNew = !postMediaDetailsArray.some((postMediaDetails) => postMediaDetails.postLink == newPostMediaDetails.postLink);
+        if (flagNew) postMediaDetailsArray.push(newPostMediaDetails);
+      });
 
       index++;
       console.log(`Carousel slide index: ${index}`);
@@ -149,7 +150,7 @@ class InstaScraper {
       const imgDetails = imgLinks.map((imgLink) => ({ postType: "image", postLink: imgLink }));
       const videoLinks = [...document.querySelectorAll('div[role="dialog"] article video')].map((vidEl) => vidEl.src);
       const vidsDetails = videoLinks.map((vidlink) => ({ postType: "video", postLink: vidlink }));
-      const postMediaDetails = [...imgDetails, ...vidsDetails];
+      let postMediaDetails = [...imgDetails, ...vidsDetails];
 
       const url = document.URL;
       const postCode = url.split("/p/")[1]?.split("/")[0] || url.split("/reel/")[1]?.split("/")[0] || null;
@@ -157,7 +158,7 @@ class InstaScraper {
 
       let isCarouselPost = !!document.querySelector('div[aria-modal="true"][role="dialog"] article').querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
 
-      postMediaDetails.map((obj) => ({ postCode, imgIndex, isCarouselPost, ...obj }));
+      postMediaDetails = postMediaDetails.map((obj) => ({ postCode, isCarouselPost, ...obj }));
       return postMediaDetails;
     });
   };
@@ -182,14 +183,15 @@ class InstaScraper {
         return false;
       }
 
-      const saved = await this.saveCapturedImage(hit.url, hit.buf, postMediaDetails.postCode, postMediaDetails.imgIndex);
+      const imageSavePath = await this.saveCapturedImage(hit.url, hit.buf, postMediaDetails.postCode, postMediaDetails.imgIndex);
       capture.responses.delete(pathname);
-      return saved;
+      return imageSavePath;
     }
 
     // Video
-    if (postMediaDetails.postType === "video") {
-      await this.downloadInstagramPostVideo();
+    else if (postMediaDetails.postType === "video") {
+      const videoSavePath = await this.downloadInstagramPostVideo();
+      return videoSavePath;
     }
 
     return false;

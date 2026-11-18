@@ -405,6 +405,46 @@ class InstaScraper {
 module.exports = new InstaScraper();
 ```
 
-```javascript
+```json
+[
+  {
+    "imgIndex": 1,
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.fjdh1-6.fna.fbcdn.net/v/t51.82787-15/655219030_18222955906311754_5130165627267846649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTE5NDc5NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=Dpz9AA99TdUQ7kNvwF8WSFS&_nc_oc=AdoACCA2g8AA1QcJkk1JdQKBdZXqVac27pkOhUtbw4HpNscKRySkkLrXwbrwHtHOV0yIXdly7ULDZwCynRRjlznC&_nc_zt=23&_nc_ht=instagram.fjdh1-6.fna&_nc_gid=Y-ng_mlsumLOymDkUx_xhg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQQfXSqUl5dYmlnIiN1uZvQf4-iWqexo4I5gqedb3Fj8pg&oe=6B039404",
+    "savePath": "E:\\Projects\\instaAuto-v2\\data\\Jitendra_goswami132\\carousels\\jitendra_goswami132-CgvgvLPL8G5-1.jpg"
+  },
+  {
+    "imgIndex": 2,
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.fjdh1-5.fna.fbcdn.net/v/t51.82787-15/657874689_18574948642063555_9219777910347432375_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTAyMjU2Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNjM5LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=cf8DzpQ-PJEQ7kNvwFRsri_&_nc_oc=AdrKKcXsFAfnuuvgZzZ-mQ3t5ypQi8xJzTfGs07geyhrGLTy8v9wNgHkJsiKIsx4btDWZmOoq33c1YJ5AEl2YjLh&_nc_zt=23&_nc_ht=instagram.fjdh1-5.fna&_nc_gid=Y-ng_mlsumLOymDkUx_xhg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTw3x_qw7-XGX8PY17LnQxkVOmbmKGJixWfS4mJ5bXUeQ&oe=6B0398F5",
+    "savePath": "E:\\Projects\\instaAuto-v2\\data\\Jitendra_goswami132\\carousels\\jitendra_goswami132-CgvgvLPL8G5-2.jpg"
+  }
+]
+```
 
+```json
+[
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.fjdh1-6.fna.fbcdn.net/v/t51.82787-15/655219030_18222955906311754_5130165627267846649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTE5NDc5NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=Dpz9AA99TdUQ7kNvwF8WSFS&_nc_oc=AdoACCA2g8AA1QcJkk1JdQKBdZXqVac27pkOhUtbw4HpNscKRySkkLrXwbrwHtHOV0yIXdly7ULDZwCynRRjlznC&_nc_zt=23&_nc_ht=instagram.fjdh1-6.fna&_nc_gid=Y-ng_mlsumLOymDkUx_xhg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQQfXSqUl5dYmlnIiN1uZvQf4-iWqexo4I5gqedb3Fj8pg&oe=6B039404"
+  },
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.fjdh1-2.fna.fbcdn.net/v/t51.82787-15/654126276_18089319326237145_5769222575258129846_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTIwNjU3OQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzE5LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=W0g32CAkLrUQ7kNvwFqxy3p&_nc_oc=Adp3gX-1EHV-ygoFK3BPTp63aJQrEahBPKEZsObMN1iEPvynx43zoMbQ9bnxVlROZbYoWJCKyHZIDynkrIW1BqzF&_nc_zt=23&_nc_ht=instagram.fjdh1-2.fna&_nc_gid=Y-ng_mlsumLOymDkUx_xhg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTDjm7O7Opfk3Hi08w8_WP_F6KiVwohnVxq02X9MQYRwA&oe=6B03759D"
+  },
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.fjdh1-5.fna.fbcdn.net/v/t51.82787-15/657874689_18574948642063555_9219777910347432375_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTAyMjU2Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNjM5LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=cf8DzpQ-PJEQ7kNvwFRsri_&_nc_oc=AdrKKcXsFAfnuuvgZzZ-mQ3t5ypQi8xJzTfGs07geyhrGLTy8v9wNgHkJsiKIsx4btDWZmOoq33c1YJ5AEl2YjLh&_nc_zt=23&_nc_ht=instagram.fjdh1-5.fna&_nc_gid=Y-ng_mlsumLOymDkUx_xhg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTw3x_qw7-XGX8PY17LnQxkVOmbmKGJixWfS4mJ5bXUeQ&oe=6B0398F5"
+  }
+]
 ```
