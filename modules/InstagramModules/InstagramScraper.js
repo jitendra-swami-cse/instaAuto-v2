@@ -86,18 +86,22 @@ class InstaScraper {
         await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
         let isNextBtnExists,
+          postDetails,
           postDownloaded = 0;
 
         do {
           const postMediaDetails = await this.postMediaDetailsExtraction();
+          postDetails = await this.scrapePostMetaData(postMediaDetails[0]);
 
           if (!postMediaDetails[0].isCarouselPost) {
-            await this.downloadPostMedia(postMediaDetails[0], capture);
+            postDetails.mediaSavedPath = await this.downloadPostMedia(postMediaDetails[0], capture);
           } else {
             await this.downloadCarousel(postMediaDetails, capture);
           }
 
           await Browser.EnhancedPage.waitForPageLoad();
+          postDetails = await this.scrapePostMetaData(postMediaDetails[0]);
+
           isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
           if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
           postDownloaded++;
@@ -114,36 +118,7 @@ class InstaScraper {
     console.log("All Posts scraping Done.");
   };
 
-  /* ────────────────────────────── Download: carousel ────────────────────────────── */
-
-  downloadCarousel = async (postMediaDetailsArray, capture) => {
-    let index = 1;
-    while (true) {
-      postMediaDetailsArray = postMediaDetailsArray.map((obj, i) => ({ imgIndex: i + 1, ...obj }));
-      for (const postMediaDetails of postMediaDetailsArray) {
-        if (!postMediaDetails.savePath) postMediaDetails.savePath = await this.downloadPostMedia(postMediaDetails, capture);
-      }
-
-      const hasNext = await Browser.page.evaluate(() => !!document.querySelector('div[role="dialog"] article button[aria-label="Next"]'));
-      if (!hasNext) break;
-
-      await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
-      await Browser.EnhancedPage.waitForPageLoad();
-
-      const newPostMediaDetailsArray = await this.postMediaDetailsExtraction();
-      newPostMediaDetailsArray.forEach((newPostMediaDetails) => {
-        const flagNew = !postMediaDetailsArray.some((postMediaDetails) => postMediaDetails.postLink == newPostMediaDetails.postLink);
-        if (flagNew) postMediaDetailsArray.push(newPostMediaDetails);
-      });
-
-      index++;
-      console.log(`Carousel slide index: ${index}`);
-    }
-
-    console.log(`Carousel done: ${index} slides processed`);
-  };
-
-  /* ────────────────────────────── Extraction ────────────────────────────── */
+  /* ────────────────────────────── Extraction Post Media Details Must before Downloading ────────────────────────────── */
 
   postMediaDetailsExtraction = async () => {
     return await Browser.page.evaluate(() => {
@@ -158,7 +133,7 @@ class InstaScraper {
 
       const url = document.URL;
       const postCode = url.split("/p/")[1]?.split("/")[0] || url.split("/reel/")[1]?.split("/")[0] || null;
-      const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
+      // const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
 
       let isCarouselPost = !!document
         .querySelector('div[aria-modal="true"][role="dialog"] article')
@@ -169,7 +144,72 @@ class InstaScraper {
     });
   };
 
-  /* ────────────────────────────── Download: one item ────────────────────────────── */
+  /* ────────────────────────────── Extraction Post MetaData ────────────────────────────── */
+  scrapePostMetaData = async (postMediaDetails) => {
+    try {
+      const postDescription = await Browser.page.evaluate(() => document.querySelectorAll("ul h1").textContent);
+      const numberOfLikes = await Browser.page.evaluate(() => document.querySelector('[href*="/liked_by/"]').textContent.split(" ")[0] * 1);
+      const comments = await Browser.page.evaluate(() => {
+        /*   let arr = [];
+        document.querySelectorAll("ul").forEach((el) => el.textContent.includes("Reply") && arr.push(el));
+        let arr1 = arr.map((el) => el.querySelector("h3"));
+        let arr2 = arr1.map((el) => el.nextElementSibling);
+        let comments = arr2.map((el) => el.textContent);
+        let originalComments = [...new Set(comments)];
+        originalComments; */
+        // -=-=-=-=-=-=-=-=- OR -=-=-=-=-=-=-=-=-
+        let arr = [];
+        document.querySelectorAll("ul").forEach((el) => el.textContent.includes("Reply") && arr.push(el));
+        return [...new Set(arr.map((el) => el.querySelector("h3").nextElementSibling.textContent))];
+      });
+
+      const postMetaData = { postDescription, numberOfLikes, comments };
+      const postDetails = { ...postMetaData, ...postMediaDetails };
+      return postDetails;
+    } catch (error) {
+      console.error(`Error in function scrapePostMetaData ...... ❌💀❌💀❌💀❌.`);
+      console.error(error);
+      return false;
+    }
+  };
+
+  /* ────────────────────────────── Download: carousel ────────────────────────────── */
+
+  downloadCarousel = async (postMediaDetailsArray, capture) => {
+    try {
+      let index = 1;
+      while (true) {
+        postMediaDetailsArray = postMediaDetailsArray.map((obj, i) => ({ imgIndex: i + 1, ...obj }));
+        for (const postMediaDetails of postMediaDetailsArray) {
+          if (!postMediaDetails.savePath) postMediaDetails.savePath = await this.downloadPostMedia(postMediaDetails, capture);
+        }
+
+        const hasNext = await Browser.page.evaluate(() => !!document.querySelector('div[role="dialog"] article button[aria-label="Next"]'));
+        if (!hasNext) break;
+
+        await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
+        await Browser.EnhancedPage.waitForPageLoad();
+
+        const newPostMediaDetailsArray = await this.postMediaDetailsExtraction();
+        newPostMediaDetailsArray.forEach((newPostMediaDetails) => {
+          const flagNew = !postMediaDetailsArray.some((postMediaDetails) => postMediaDetails.postLink == newPostMediaDetails.postLink);
+          if (flagNew) postMediaDetailsArray.push(newPostMediaDetails);
+        });
+
+        index++;
+        console.log(`Carousel slide index: ${index}`);
+      }
+
+      console.log(`Carousel done: ${index} slides processed`);
+      return postMediaDetailsArray;
+    } catch (error) {
+      console.error(`Error in function downloadCarousel ...... ❌💀❌💀❌💀❌.`);
+      console.error(error);
+      return false;
+    }
+  };
+
+  /* ────────────────────────────── Download: Video or Image Media of Post not carousel ────────────────────────────── */
 
   downloadPostMedia = async (postMediaDetails, capture) => {
     // Image
@@ -298,7 +338,7 @@ class InstaScraper {
     return false;
   };
 
-  /* ────────────────────────────── Video ────────────────────────────── */
+  /* ────────────────────────────── Video Recording and Downloading that Recording ────────────────────────────── */
 
   downloadInstagramPostVideo = async () => {
     const page = Browser.page;
