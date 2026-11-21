@@ -1,0 +1,96 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 21-11-26 09-42-57 =-=-=-=-=-=-
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Failed to scrape posts from Jitendra_goswami132: imageSavePath is not defined
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg (62.7 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-3.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-4.jpg (48.8 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-5.jpg (46.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg (62.7 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-3.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-4.jpg (48.8 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-5.jpg (62.7 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-6.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-7.jpg (62.7 KB)
+selectorString: [aria-label="Next"]
+Failed to scrape posts from Jitendra_goswami132: AbortError: The play() request was interrupted by a call to pause(). https://goo.gl/LdLk22
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg (62.7 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-3.jpg (46.7 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-4.jpg (48.8 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-5.jpg (46.7 KB)
+selectorString: [aria-label="Next"]
+Video saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\videos\jitendra_goswami132-1795234649483.webm (3.43 MB)
+selectorString: [aria-label="Next"]
+Video saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\videos\jitendra_goswami132-1795234668197.webm (9.85 MB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CboYWdMrYit.jpg (54.7 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CXlj_u4F2QH.jpg (67.5 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CWDXm0fvnlV.jpg (46.6 KB)
+selectorString: [aria-label="Next"]
+Video saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\videos\jitendra_goswami132-1795234727425.webm (5.85 MB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CV9de-6Fudj.jpg (166.9 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CVkrbKTvQwv.jpg (55.0 KB)
+selectorString: [aria-label="Next"]
+Video saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\videos\jitendra_goswami132-1795234753660.webm (1.35 MB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CVVAEbAhGHp-1.webp (36.2 KB)
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CVVAEbAhGHp-2.webp (32.2 KB)
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CVVAEbAhGHp-3.webp (36.2 KB)
+selectorString: [aria-label="Next"]
+Response missing for https://instagram.famd15-1.fna.fbcdn.net/v/t51.82787-15/657233275_18349236055212403_7662319214510482999_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&_nc_map=urlgen_bucketless&ig_cache_key=MjQ4NjYyMzY0MzM1MTEwNTAzMw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=1ZjLXaTaDYYQ7kNvwE8KIaf&_nc_oc=AdpEoJq9FXErjuSJn6EPP-ZRIsNwFYPVU3IFdMFu24fq8Y6Cj82jSVFW5zALb7cGvDc&_nc_zt=23&_nc_ht=instagram.famd15-1.fna&_nc_gid=9p9FivpIkW_lfm1QaT7Tzg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTO3teKbvB5hBRXsSMjkCn9niAYajnZQCM6E5pHFUhxSg&oe=6B06D842
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CKCQwgLhY63-2.jpg (33.8 KB)
+selectorString: article button[aria-label="Next"]
+Response missing for https://instagram.famd15-1.fna.fbcdn.net/v/t51.82787-15/657233275_18349236055212403_7662319214510482999_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&_nc_map=urlgen_bucketless&ig_cache_key=MjQ4NjYyMzY0MzM1MTEwNTAzMw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=1ZjLXaTaDYYQ7kNvwE8KIaf&_nc_oc=AdpEoJq9FXErjuSJn6EPP-ZRIsNwFYPVU3IFdMFu24fq8Y6Cj82jSVFW5zALb7cGvDc&_nc_zt=23&_nc_ht=instagram.famd15-1.fna&_nc_gid=9p9FivpIkW_lfm1QaT7Tzg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTO3teKbvB5hBRXsSMjkCn9niAYajnZQCM6E5pHFUhxSg&oe=6B06D842
+Response missing for https://instagram.famd15-1.fna.fbcdn.net/v/t51.82787-15/657233275_18349236055212403_7662319214510482999_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&_nc_map=urlgen_bucketless&ig_cache_key=MjQ4NjYyMzY0MzM1MTEwNTAzMw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTA4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=1ZjLXaTaDYYQ7kNvwE8KIaf&_nc_oc=AdpEoJq9FXErjuSJn6EPP-ZRIsNwFYPVU3IFdMFu24fq8Y6Cj82jSVFW5zALb7cGvDc&_nc_zt=23&_nc_ht=instagram.famd15-1.fna&_nc_gid=9p9FivpIkW_lfm1QaT7Tzg&_nc_ss=7b6a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTO3teKbvB5hBRXsSMjkCn9niAYajnZQCM6E5pHFUhxSg&oe=6B06D842&_t=1795234769989
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CHskJYnBvpy.jpg (43.9 KB)

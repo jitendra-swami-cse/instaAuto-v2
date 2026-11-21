@@ -85,8 +85,10 @@ class InstaScraper {
         await Browser.EnhancedPage.clickNotClickable('a[href*="/p/"], a[href*="/reel/"]');
         await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
-        let postDownloaded = 0;
-        while (postDownloaded < maxPosts) {
+        let isNextBtnExists,
+          postDownloaded = 0;
+
+        do {
           const postMediaDetails = await this.postMediaDetailsExtraction();
 
           if (!postMediaDetails[0].isCarouselPost) {
@@ -95,11 +97,13 @@ class InstaScraper {
             await this.downloadCarousel(postMediaDetails, capture);
           }
 
-          await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
+          await Browser.EnhancedPage.waitForPageLoad();
+          isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
+          if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
           postDownloaded++;
           console.log(`Posts downloaded: ${postDownloaded}`);
           await utils.randomDelay(1, 2);
-        }
+        } while (postDownloaded < maxPosts);
       } finally {
         capture.stop();
       }
@@ -156,7 +160,9 @@ class InstaScraper {
       const postCode = url.split("/p/")[1]?.split("/")[0] || url.split("/reel/")[1]?.split("/")[0] || null;
       const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
 
-      let isCarouselPost = !!document.querySelector('div[aria-modal="true"][role="dialog"] article').querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
+      let isCarouselPost = !!document
+        .querySelector('div[aria-modal="true"][role="dialog"] article')
+        .querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
 
       postMediaDetails = postMediaDetails.map((obj) => ({ postCode, isCarouselPost, ...obj }));
       return postMediaDetails;
@@ -247,7 +253,9 @@ class InstaScraper {
     const ext = (new URL(src).pathname.match(/\.(jpe?g|png|webp|heic)$/i) || [, "jpg"])[1].toLowerCase();
     const { profilePath, username } = ConfigManager.currentProfile;
 
-    const imageSavePath = imgIndex ? path.resolve(profilePath, "carousels", `${username}-${postCode}-${imgIndex}.${ext}`) : path.resolve(profilePath, "images", `${username}-${postCode}.${ext}`);
+    const imageSavePath = imgIndex
+      ? path.resolve(profilePath, "carousels", `${username}-${postCode}-${imgIndex}.${ext}`)
+      : path.resolve(profilePath, "images", `${username}-${postCode}.${ext}`);
 
     if (await fs.pathExists(imageSavePath)) {
       await Logger.logMSG(`Already exists, skipping: ${imageSavePath}`);
