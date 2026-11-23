@@ -181,10 +181,13 @@ class InstaScraper {
           ...postMediaDetails,
         };
 
-      if (postMediaDetails.isCarouselPost) imagePostContainingElements = slideLis[visibleIndex]?.querySelectorAll('img[src*="cdninstagram"], img[src*="fbcdn"]');
+      if (postMediaDetails.isCarouselPost)
+        imagePostContainingElements = slideLis[visibleIndex]?.querySelectorAll('img[src*="cdninstagram"], img[src*="fbcdn"]');
       else imagePostContainingElements = article.querySelectorAll('img[src*="cdninstagram"], img[src*="fbcdn"]');
 
-      imagePost = [...imagePostContainingElements].filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150).sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)[0];
+      imagePost = [...imagePostContainingElements]
+        .filter((i) => i.naturalWidth > 150 && i.naturalHeight > 150)
+        .sort((a, b) => b.naturalWidth * b.naturalHeight - a.naturalWidth * a.naturalHeight)[0];
 
       return {
         postType: "image",
@@ -448,3 +451,28 @@ module.exports = new InstaScraper();
   }
 ]
 ```
+
+<!-- -=-==-================================ -->
+
+at this point postDetails object is as below
+
+```json
+{
+  "postDescription": undefined,
+  "numberOfLikes": 56,
+  "comments": [],
+  "postCode": "CwB-tVwREKJ",
+  "isCarouselPost": false,
+  "mediaSavedPath": "D:\\Jitu\\Ideas and projects\\instaAuto-v2\\data\\Jitendra_goswami132\\images\\jitendra_goswami132-CwB-tVwREKJ.webp",
+  "postLink": "D:\\Jitu\\Ideas and projects\\instaAuto-v2\\data\\Jitendra_goswami132\\images\\jitendra_goswami132-CwB-tVwREKJ.webp",
+  "postType": "image"
+}
+```
+
+use this postDetails object to determine the path to save this (postDetails) as json file (if File already exists than overwrite that)
+if postDetails.postType === "video" then the path for json file will be as -> path.resolve(profilePath, "videos", `${username}-${postCode}.json`);
+else path will be as -> imgIndex ? path.resolve(profilePath, "carousels", `${username}-${postCode}-${imgIndex}.json`): imgIndex ? path.resolve(profilePath, "images", `${username}-${postCode}-.json`)
+
+NOTE write shortest possible code
+
+other required details you can find out yourseleve by analyzing this script

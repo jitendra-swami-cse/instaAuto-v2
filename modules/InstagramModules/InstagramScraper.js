@@ -5,6 +5,7 @@ const ConfigManager = require("../CoreModules/ConfigManager.js");
 const Logger = require("../CoreModules/Logger.js");
 const Instagram = require("./Instagram.js");
 const utils = require("../../utils/utils.js");
+const { error } = require("console");
 
 class InstaScraper {
   constructor() {
@@ -91,16 +92,16 @@ class InstaScraper {
 
         do {
           const postMediaDetails = await this.postMediaDetailsExtraction();
-          postDetails = await this.scrapePostMetaData(postMediaDetails[0]);
 
           if (!postMediaDetails[0].isCarouselPost) {
-            postDetails.mediaSavedPath = await this.downloadPostMedia(postMediaDetails[0], capture);
+            postMediaDetails[0].mediaSavedPath = await this.downloadPostMedia(postMediaDetails[0], capture);
           } else {
-            await this.downloadCarousel(postMediaDetails, capture);
+            const carouselMedia = await this.downloadCarousel(postMediaDetails, capture);
+            postMediaDetails[0].mediaSavedPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
+            postMediaDetails[0].imgIndex = 1;
           }
 
           await Browser.EnhancedPage.waitForPageLoad();
-          postDetails = await this.scrapePostMetaData(postMediaDetails[0]);
 
           isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
           if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
@@ -165,6 +166,20 @@ class InstaScraper {
 
       const postMetaData = { postDescription, numberOfLikes, comments };
       const postDetails = { ...postMetaData, ...postMediaDetails };
+      const { username, profilePath } = ConfigManager.currentProfile;
+      await fs.writeJson(
+        path.resolve(
+          profilePath,
+          postDetails.postType === "video" ? "videos" : postDetails.imgIndex ? "carousels" : "images",
+          `${username}-${postDetails.postCode}${postDetails.imgIndex ? `-${postDetails.imgIndex}` : ""}.json`,
+        ),
+        postDetails,
+        { spaces: 2 },
+      );
+      // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--
+
+      // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--
+
       return postDetails;
     } catch (error) {
       console.error(`Error in function scrapePostMetaData ...... ❌💀❌💀❌💀❌.`);
@@ -212,35 +227,40 @@ class InstaScraper {
   /* ────────────────────────────── Download: Video or Image Media of Post not carousel ────────────────────────────── */
 
   downloadPostMedia = async (postMediaDetails, capture) => {
-    // Image
-    if (postMediaDetails.postType === "image") {
-      const src = postMediaDetails.postLink;
-      if (!src) {
-        await Logger.logMSG(`No image src (${postMediaDetails.postCode})`);
-        return false;
+    let downloadPath;
+    try {
+      // Image
+      if (postMediaDetails.postType === "image") {
+        const src = postMediaDetails.postLink;
+        if (!src) {
+          await Logger.logMSG(`No image src (${postMediaDetails.postCode})`);
+          return false;
+        }
+
+        await this.forceFreshImageLoad(src, capture);
+
+        const pathname = new URL(src).pathname;
+        const hit = capture.responses.get(pathname);
+        if (!hit) {
+          await Logger.logMSG(`Response missing for ${src}`);
+          return false;
+        }
+
+        downloadPath = await this.saveCapturedImage(hit.url, hit.buf, postMediaDetails.postCode, postMediaDetails.imgIndex);
+        capture.responses.delete(pathname);
       }
 
-      await this.forceFreshImageLoad(src, capture);
-
-      const pathname = new URL(src).pathname;
-      const hit = capture.responses.get(pathname);
-      if (!hit) {
-        await Logger.logMSG(`Response missing for ${src}`);
-        return false;
+      // Video
+      else if (postMediaDetails.postType === "video") {
+        downloadPath = await this.downloadInstagramPostVideo();
       }
 
-      const imageSavePath = await this.saveCapturedImage(hit.url, hit.buf, postMediaDetails.postCode, postMediaDetails.imgIndex);
-      capture.responses.delete(pathname);
-      return imageSavePath;
+      await this.scrapePostMetaData(postMediaDetails);
+      return downloadPath;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-
-    // Video
-    else if (postMediaDetails.postType === "video") {
-      const videoSavePath = await this.downloadInstagramPostVideo();
-      return videoSavePath;
-    }
-
-    return false;
   };
 
   /* ────────────────────────────── Image capture plumbing ────────────────────────────── */
@@ -293,9 +313,7 @@ class InstaScraper {
     const ext = (new URL(src).pathname.match(/\.(jpe?g|png|webp|heic)$/i) || [, "jpg"])[1].toLowerCase();
     const { profilePath, username } = ConfigManager.currentProfile;
 
-    const imageSavePath = imgIndex
-      ? path.resolve(profilePath, "carousels", `${username}-${postCode}-${imgIndex}.${ext}`)
-      : path.resolve(profilePath, "images", `${username}-${postCode}.${ext}`);
+    const imageSavePath = path.resolve(profilePath, imgIndex ? "carousels" : "images", `${username}-${postCode}${imgIndex ? `-${imgIndex}` : ""}.${ext}`);
 
     if (await fs.pathExists(imageSavePath)) {
       await Logger.logMSG(`Already exists, skipping: ${imageSavePath}`);
