@@ -56,6 +56,20 @@ class ConfigManager {
 
     return profilePath;
   };
+
+  getProfile = async (username) => {
+    const profilePath = path.resolve(process.cwd(), "data", username, `${username}.json`);
+    const profileData = await this.loadJson(profilePath, { posts: [] });
+    return profileData;
+  };
+
+  /* ────────────────────────────── Check status of Profile or Post ────────────────────────────── */
+  checkStatus = async (obj) => {
+    if (obj.postCode) {
+      const foundPost = this.currentProfile?.posts?.find((post) => post.postCode === obj.postCode);
+      if (!foundPost) return "update";
+    }
+  };
   //   getAccounts() {
   //   return this.accounts;
   // }

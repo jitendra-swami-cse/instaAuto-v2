@@ -15,7 +15,7 @@ async function main() {
   // =========== Code under testing and Development ==============
   const username = "Jitendra_goswami132";
 
-  const profileInfo = await InstagramScraper.scrapePosts(username);
+  const profileInfo = await InstagramScraper.scrapeProfile(username);
   console.log("Profile Info:", profileInfo);
 
   // =========================

@@ -50,7 +50,7 @@ class InstaScraper {
         };
       });
 
-      ConfigManager.currentProfile = profileMetaData;
+      ConfigManager.currentProfile = { ...ConfigManager.currentProfile, ...profileMetaData };
       ConfigManager.currentProfile.profilePath = await ConfigManager.createProfileStructure(username);
 
       await fs.writeJson(`${ConfigManager.currentProfile.profilePath}/${username}.json`, ConfigManager.currentProfile, { spaces: 2 });
@@ -63,8 +63,11 @@ class InstaScraper {
 
   /* ────────────────────────────── Scrape loop ────────────────────────────── */
 
-  scrapePosts = async (username, options = {}) => {
+  scrapeProfile = async (username, options = {}) => {
     try {
+      ConfigManager.currentProfile = ConfigManager.getProfile(username);
+
+      // Still needs a place to check or add posts = []
       let { maxPosts = 50 } = options;
 
       await Logger.logMSG(`Scraping posts from: ${username}`);
@@ -87,22 +90,25 @@ class InstaScraper {
         await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
         let isNextBtnExists,
-          postDetails,
           postDownloaded = 0;
 
         do {
           const postMediaDetails = await this.postMediaDetailsExtraction();
 
+          const shouldUpdate = await ConfigManager.checkStatus(postMediaDetails[0]);
+          if (shouldUpdate !== "update") return true;
+
           if (!postMediaDetails[0].isCarouselPost) {
-            postMediaDetails[0].mediaSavedPath = await this.downloadPostMedia(postMediaDetails[0], capture);
+            postMediaDetails[0].mediaDownloadPath = await this.downloadPostMedia(postMediaDetails[0], capture);
           } else {
             const carouselMedia = await this.downloadCarousel(postMediaDetails, capture);
-            postMediaDetails[0].mediaSavedPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
+            postMediaDetails[0].mediaDownloadPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
             postMediaDetails[0].imgIndex = 1;
           }
 
           await Browser.EnhancedPage.waitForPageLoad();
 
+          await ConfigManager.updateStatus();
           isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
           if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
           postDownloaded++;
@@ -164,8 +170,7 @@ class InstaScraper {
         return [...new Set(arr.map((el) => el.querySelector("h3").nextElementSibling.textContent))];
       });
 
-      const postMetaData = { postDescription, numberOfLikes, comments };
-      const postDetails = { ...postMetaData, ...postMediaDetails };
+      const postDetails = { postDescription, numberOfLikes, comments, ...postMediaDetails };
       const { username, profilePath } = ConfigManager.currentProfile;
       await fs.writeJson(
         path.resolve(
@@ -255,7 +260,8 @@ class InstaScraper {
         downloadPath = await this.downloadInstagramPostVideo();
       }
 
-      await this.scrapePostMetaData(postMediaDetails);
+      const postDetails = await this.scrapePostMetaData(postMediaDetails);
+      // ConfigManager.currentProfile.posts.push(postDetails)
       return downloadPath;
     } catch (error) {
       console.error(error);
