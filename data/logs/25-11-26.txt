@@ -1,0 +1,224 @@
+======= Browser Automation Started (New Architecture) =======
+-=-=-=-=-=-= This Log Created on 25-11-26 14-45-06 =-=-=-=-=-=-
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to chrome://new-tab-page/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to https://www.instagram.com/p/CgvgvLPL8G5/?img_index=1
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+Failed to scrape posts from Jitendra_goswami132: post is not defined
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to https://www.instagram.com/p/CwB-tVwREKJ/
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\images\jitendra_goswami132-CwB-tVwREKJ.webp (80.7 KB)
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+selectorString: article button[aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg (46.7 KB)
+selectorString: article button[aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Navigating to profile: https://www.instagram.com/Jitendra_goswami132/
+Page.navigateTo(https://www.instagram.com/Jitendra_goswami132/) called.
+Completed Navigation to https://instagram.famd1-1.fna.fbcdn.net/v/t51.82787-15/655219030_18222955906311754_5130165627267846649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTE5NDc5NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=asrJMYMpSh8Q7kNvwFKQg9O&_nc_oc=AdrGhjXFFK7EX7l5dT6m5vs03VtL06-xS61TTXlPETcCoClbn1QhO5k6npx-pDMa7Q4&_nc_zt=23&_nc_ht=instagram.famd1-1.fna&_nc_gid=4pdlKpe4of9niiF6uy4FvA&_nc_ss=7b7a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQRE6_myE2BXcRsxs0sZ2EOUB-AEKuifmMjG2ayWZK3xKw&oe=6B0C9644
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Image saved: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg (62.7 KB)
+selectorString: article button[aria-label="Next"]
+Failed to scrape posts from Jitendra_goswami132: carouselMedia is not defined
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg
+selectorString: article button[aria-label="Next"]
+Failed to scrape posts from Jitendra_goswami132: carouselMedia is not defined
+Scraping posts from: Jitendra_goswami132
+Initializing browser for profile target: 2
+Browser initialized successfully for profile: undefined
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+Already on profile: https://www.instagram.com/Jitendra_goswami132/, But waiting for page load.
+selectorString: a[href*="/p/"], a[href*="/reel/"]
+selectorString: div[role="dialog"] article
+selectorString: [aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-1.jpg
+selectorString: article button[aria-label="Next"]
+Already exists, skipping: D:\Jitu\Ideas and projects\instaAuto-v2\data\Jitendra_goswami132\carousels\jitendra_goswami132-CgvgvLPL8G5-2.jpg
+selectorString: article button[aria-label="Next"]

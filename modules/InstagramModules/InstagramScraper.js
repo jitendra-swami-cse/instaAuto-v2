@@ -65,9 +65,8 @@ class InstaScraper {
 
   scrapeProfile = async (username, options = {}) => {
     try {
-      ConfigManager.currentProfile = ConfigManager.getProfile(username);
+      ConfigManager.currentProfile ||= await ConfigManager.getProfile(username);
 
-      // Still needs a place to check or add posts = []
       let { maxPosts = 50 } = options;
 
       await Logger.logMSG(`Scraping posts from: ${username}`);
@@ -90,25 +89,28 @@ class InstaScraper {
         await Browser.EnhancedPage.waitForElementRobust('div[role="dialog"] article');
 
         let isNextBtnExists,
+          postDetails,
           postDownloaded = 0;
 
         do {
-          const postMediaDetails = await this.postMediaDetailsExtraction();
+          const postMediaDetailsArr = await this.postMediaDetailsExtraction();
 
-          const shouldUpdate = await ConfigManager.checkStatus(postMediaDetails[0]);
-          if (shouldUpdate !== "update") return true;
+          const shouldUpdate = await ConfigManager.updatePostStatus(postMediaDetailsArr[0]);
+          if (shouldUpdate === "needUpdate") {
+            if (!postMediaDetailsArr[0].isCarouselPost) {
+              postDetails = await this.downloadPostMedia(postMediaDetailsArr[0], capture);
+            } else {
+              postDetails = await this.downloadCarousel(postMediaDetailsArr, capture);
+              postMediaDetailsArr[0].mediaDownloadPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
+              postMediaDetailsArr[0].imgIndex = 1;
+            }
 
-          if (!postMediaDetails[0].isCarouselPost) {
-            postMediaDetails[0].mediaDownloadPath = await this.downloadPostMedia(postMediaDetails[0], capture);
-          } else {
-            const carouselMedia = await this.downloadCarousel(postMediaDetails, capture);
-            postMediaDetails[0].mediaDownloadPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
-            postMediaDetails[0].imgIndex = 1;
+            await Browser.EnhancedPage.waitForPageLoad();
+
+            const isUpdated = await ConfigManager.updatePostStatus(postDetails, true);
+            if (isUpdated === "postUpdatedSuccessfully") await ConfigManager.writeCurrenProfileStatus();
           }
 
-          await Browser.EnhancedPage.waitForPageLoad();
-
-          await ConfigManager.updateStatus();
           isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
           if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
           postDownloaded++;
@@ -197,12 +199,16 @@ class InstaScraper {
 
   downloadCarousel = async (postMediaDetailsArray, capture) => {
     try {
+      let currentCarouselPost, newPostMediaDetailsArray, postDetails;
+      let carouselPostsDetailsArr = [];
       let index = 1;
       while (true) {
-        postMediaDetailsArray = postMediaDetailsArray.map((obj, i) => ({ imgIndex: i + 1, ...obj }));
-        for (const postMediaDetails of postMediaDetailsArray) {
-          if (!postMediaDetails.savePath) postMediaDetails.savePath = await this.downloadPostMedia(postMediaDetails, capture);
-        }
+        currentCarouselPost = postMediaDetailsArray[0];
+        currentCarouselPost.imgIndex = index;
+
+        postDetails = await this.downloadPostMedia(currentCarouselPost, capture);
+
+        carouselPostsDetailsArr.push(currentCarouselPost);
 
         const hasNext = await Browser.page.evaluate(() => !!document.querySelector('div[role="dialog"] article button[aria-label="Next"]'));
         if (!hasNext) break;
@@ -210,10 +216,12 @@ class InstaScraper {
         await Browser.EnhancedPage.clickNotClickable('article button[aria-label="Next"]');
         await Browser.EnhancedPage.waitForPageLoad();
 
-        const newPostMediaDetailsArray = await this.postMediaDetailsExtraction();
-        newPostMediaDetailsArray.forEach((newPostMediaDetails) => {
-          const flagNew = !postMediaDetailsArray.some((postMediaDetails) => postMediaDetails.postLink == newPostMediaDetails.postLink);
-          if (flagNew) postMediaDetailsArray.push(newPostMediaDetails);
+        newPostMediaDetailsArray = await this.postMediaDetailsExtraction();
+
+        // Updating Post media Details array by removing already scraped/downloaded posts
+        postMediaDetailsArray = newPostMediaDetailsArray.filter((newPostMediaDetails) => {
+          const flagNew = carouselPostsDetailsArr.some((postDone) => newPostMediaDetails.postLink.includes(postDone.postLink));
+          return !flagNew;
         });
 
         index++;
@@ -221,7 +229,7 @@ class InstaScraper {
       }
 
       console.log(`Carousel done: ${index} slides processed`);
-      return postMediaDetailsArray;
+      return carouselPostsDetailsArr;
     } catch (error) {
       console.error(`Error in function downloadCarousel ...... ❌💀❌💀❌💀❌.`);
       console.error(error);
@@ -261,8 +269,8 @@ class InstaScraper {
       }
 
       const postDetails = await this.scrapePostMetaData(postMediaDetails);
-      // ConfigManager.currentProfile.posts.push(postDetails)
-      return downloadPath;
+
+      return postDetails;
     } catch (error) {
       console.error(error);
       return false;

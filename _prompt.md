@@ -476,3 +476,40 @@ else path will be as -> imgIndex ? path.resolve(profilePath, "carousels", `${use
 NOTE write shortest possible code
 
 other required details you can find out yourseleve by analyzing this script
+
+<!-- -=-=-=-=-=-= -->
+
+```json
+[
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.famd1-1.fna.fbcdn.net/v/t51.82787-15/655219030_18222955906311754_5130165627267846649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTE5NDc5NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=asrJMYMpSh8Q7kNvwFKQg9O&_nc_oc=AdrGhjXFFK7EX7l5dT6m5vs03VtL06-xS61TTXlPETcCoClbn1QhO5k6npx-pDMa7Q4&_nc_zt=23&_nc_ht=instagram.famd1-1.fna&_nc_gid=BU6GdOIrNy79NhIFgfeDYA&_nc_ss=7b7a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTbkuauT8wlBk2g1FIkeCy-zcezEIyezFUYKiOxbclJ5w&oe=6B0C9644",
+    "imgIndex": 1
+  }
+]
+```
+
+```json
+[
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.famd1-1.fna.fbcdn.net/v/t51.82787-15/655219030_18222955906311754_5130165627267846649_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTE5NDc5NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzIwLnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=asrJMYMpSh8Q7kNvwFKQg9O&_nc_oc=AdrGhjXFFK7EX7l5dT6m5vs03VtL06-xS61TTXlPETcCoClbn1QhO5k6npx-pDMa7Q4&_nc_zt=23&_nc_ht=instagram.famd1-1.fna&_nc_gid=BU6GdOIrNy79NhIFgfeDYA&_nc_ss=7b7a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQTbkuauT8wlBk2g1FIkeCy-zcezEIyezFUYKiOxbclJ5w&oe=6B0C9644&_t=1795603928124"
+  },
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.famd1-1.fna.fbcdn.net/v/t51.82787-15/654126276_18089319326237145_5769222575258129846_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTIwNjU3OQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNzE5LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=OtveaPNI16EQ7kNvwE-hpXc&_nc_oc=AdrpaC2jay2YDyKuu-64CQJjIM-ROJDNw4ARuZaSXT534eXSqvBXUHEdYQ53WW7L7aM&_nc_zt=23&_nc_ht=instagram.famd1-1.fna&_nc_gid=BU6GdOIrNy79NhIFgfeDYA&_nc_ss=7b7a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQS4SLhs5iWZUmEjvBXySEgHx-y2XbNoi75QIBgPcgPytg&oe=6B0C77DD"
+  },
+  {
+    "postCode": "CgvgvLPL8G5",
+    "isCarouselPost": true,
+    "postType": "image",
+    "postLink": "https://instagram.famd15-2.fna.fbcdn.net/v/t51.82787-15/657874689_18574948642063555_9219777910347432375_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mjg5NTY3NzA2MTcwNTAyMjU2Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuNjM5LnNkci5yZWd1bGFyX3Bob3RvLkMzIn0%3D&_nc_ohc=ujSD4qlaEQ8Q7kNvwHbz-T5&_nc_oc=Adr0TAm0dVLMTeTqwJ5sIa23-gEYXicPGDL448eF3HbNZYU-V7Q7eDfKkzfTqYJ4HeY&_nc_zt=23&_nc_ht=instagram.famd15-2.fna&_nc_gid=BU6GdOIrNy79NhIFgfeDYA&_nc_ss=7b7a8&_nc_ct=RQosPBUIFQIlBAAAAA&oh=00_AQS0ddwmMHF9TXltMEUFya5rQCCC6vaLv3I3gSAuOPE0Kw&oe=6B0C9B35"
+  }
+]
+```

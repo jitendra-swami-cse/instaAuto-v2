@@ -46,6 +46,16 @@ class ConfigManager {
     return defaultValue;
   };
 
+  writeJson = (filePath, valueToWrite) => {
+    try {
+      fs.outputJsonSync(filePath, valueToWrite, { spaces: 2 });
+      return true;
+    } catch (error) {
+      console.error(`[ConfigManager] Error writing file ${filePath}:`, error.message);
+      return false;
+    }
+  };
+
   createProfileStructure = async (userName) => {
     const profilePath = path.resolve(process.cwd(), "data", userName);
 
@@ -60,15 +70,24 @@ class ConfigManager {
   getProfile = async (username) => {
     const profilePath = path.resolve(process.cwd(), "data", username, `${username}.json`);
     const profileData = await this.loadJson(profilePath, { posts: [] });
+    profileData.posts ||= [];
     return profileData;
   };
 
-  /* ────────────────────────────── Check status of Profile or Post ────────────────────────────── */
-  checkStatus = async (obj) => {
-    if (obj.postCode) {
-      const foundPost = this.currentProfile?.posts?.find((post) => post.postCode === obj.postCode);
-      if (!foundPost) return "update";
-    }
+  /* ────────────────────────────── Check status of current Profile or Post ────────────────────────────── */
+  updatePostStatus = async (postToUpdate, mustUpdate) => {
+    const foundPost = this.currentProfile?.posts?.find((post) => post.postCode === postToUpdate.postCode);
+    if (mustUpdate) {
+      if (foundPost) foundPost = { ...foundPost, ...post };
+      else this.currentProfile.posts.push(postToUpdate);
+      return "postUpdatedSuccessfully";
+    } else if (!foundPost) return "needUpdate";
+  };
+  /* ────────────────────────────── Write data of current Profile or Post ────────────────────────────── */
+  writeCurrenProfileStatus = async (username) => {
+    username ||= this.currentProfile.username;
+    const filePath = path.resolve(process.cwd(), "data", username, `${username}.json`);
+    this.writeJson(filePath, this.currentProfile || {});
   };
   //   getAccounts() {
   //   return this.accounts;
