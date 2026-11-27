@@ -56,8 +56,8 @@ class ConfigManager {
     }
   };
 
-  createProfileStructure = async (userName) => {
-    const profilePath = path.resolve(process.cwd(), "data", userName);
+  createProfileStructure = async (username) => {
+    const profilePath = path.resolve(process.cwd(), "data", username);
 
     await fs.ensureDir(profilePath);
     await fs.ensureDir(path.join(profilePath, "images"));
@@ -75,10 +75,35 @@ class ConfigManager {
   };
 
   /* ────────────────────────────── Check status of current Profile or Post ────────────────────────────── */
+  checkPostStatus = async (postMediaDetailsArr, username) => {
+    let profile;
+    if (username) profile = await this.getProfile(username);
+    else profile = this.currentProfile;
+
+    postMediaDetailsArr = postMediaDetailsArr.map((postToCheckStatus) => {
+      postToCheckStatus.postDataExists = profile.posts.some((post) => {
+        if (!post.imgIndex) return post.postCode === postToCheckStatus.postCode;
+        else post.postCode === postToCheckStatus.postCode && post.imgIndex === postToCheckStatus.imgIndex;
+      });
+
+      if (!postToCheckStatus.postDataExists) return { ...postToCheckStatus, postNeedUpdate: true };
+      else {
+        // -=-=-=- postStatus.postExists = true means post exists then perform other validation checks like -
+        //  lastScapedAt-currentDateTime > maxTimeLimitToRescrape...etc
+
+        console.log(`Post ${postToCheckStatus.postCode} exists in ${this.currentProfile.username}.json.`);
+        console.log(`\x1b[38;5;166mNo need to scrape this post again.\x1b[0m`);
+        return { ...postToCheckStatus, postNeedUpdate: false };
+      }
+    });
+    return postMediaDetailsArr;
+  };
+
   updatePostStatus = async (postToUpdate, mustUpdate) => {
-    const foundPost = this.currentProfile?.posts?.find((post) => post.postCode === postToUpdate.postCode);
+    let foundPost;
+    foundPost = this.currentProfile?.posts?.find((post) => post.postCode === postToUpdate.postCode);
     if (mustUpdate) {
-      if (foundPost) foundPost = { ...foundPost, ...post };
+      if (foundPost) foundPost = { ...foundPost, ...postToUpdate };
       else this.currentProfile.posts.push(postToUpdate);
       return "postUpdatedSuccessfully";
     } else if (!foundPost) return "needUpdate";

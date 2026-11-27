@@ -93,30 +93,36 @@ class InstaScraper {
           postDownloaded = 0;
 
         do {
-          const postMediaDetailsArr = await this.postMediaDetailsExtraction();
+          let postMediaDetailsArr = await this.postMediaDetailsExtraction();
 
-          const shouldUpdate = await ConfigManager.updatePostStatus(postMediaDetailsArr[0]);
-          if (shouldUpdate === "needUpdate") {
-            if (!postMediaDetailsArr[0].isCarouselPost) {
-              postDetails = await this.downloadPostMedia(postMediaDetailsArr[0], capture);
+          postMediaDetailsArr = await ConfigManager.checkPostStatus(postMediaDetailsArr);
+          // const shouldUpdate = await ConfigManager.updatePostStatus(postMediaDetailsArr[0]);
+          for (const postMediaDetails of postMediaDetailsArr) {
+            if (postMediaDetails.postNeedUpdate) {
+              console.log(`\t\tGoing to downoaded ${postMediaDetails.postCode} and ${postMediaDetails.imgIndex}`);
+              postDetails = await this.downloadPostMedia(postMediaDetails, capture);
             } else {
-              postDetails = await this.downloadCarousel(postMediaDetailsArr, capture);
-              postMediaDetailsArr[0].mediaDownloadPaths = carouselMedia?.map((media) => media.savePath).filter(Boolean) || [];
-              postMediaDetailsArr[0].imgIndex = 1;
+              console.log(`\t\t\t----Skiping to downoaded ${postMediaDetails.postCode} and ${postMediaDetails.imgIndex}`);
             }
 
             await Browser.EnhancedPage.waitForPageLoad();
-
-            const isUpdated = await ConfigManager.updatePostStatus(postDetails, true);
-            if (isUpdated === "postUpdatedSuccessfully") await ConfigManager.writeCurrenProfileStatus();
+            // if postMediaDetailsArr[0].isCarouselPost or postDetails is empty than  pass carouselPostsDetailsArr
+            // const isUpdated = await ConfigManager.updatePostStatus(postDetails, true);
+            // if (isUpdated === "postUpdatedSuccessfully") await ConfigManager.writeCurrenProfileStatus();
           }
 
-          isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
-          if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
+          const carouselNextBtnSelector = 'div[role="dialog"] article button[aria-label="Next"]';
+          let isCarouselNextBtnExists = await Browser.page.evaluate((selector) => !!document.querySelector(selector), carouselNextBtnSelector);
+          if (isCarouselNextBtnExists) {
+            await Browser.EnhancedPage.clickNotClickable(carouselNextBtnSelector);
+          } else {
+            isNextBtnExists = await Browser.page.evaluate(() => !!document.querySelector('[aria-label="Next"]'));
+            if (isNextBtnExists) await Browser.EnhancedPage.clickNotClickable('[aria-label="Next"]');
+          }
           postDownloaded++;
           console.log(`Posts downloaded: ${postDownloaded}`);
           await utils.randomDelay(1, 2);
-        } while (postDownloaded < maxPosts);
+        } while (isNextBtnExists && postDownloaded < maxPosts);
       } finally {
         capture.stop();
       }
@@ -142,13 +148,13 @@ class InstaScraper {
 
       const url = document.URL;
       const postCode = url.split("/p/")[1]?.split("/")[0] || url.split("/reel/")[1]?.split("/")[0] || null;
-      // const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
+      const imgIndex = url.match(/[?&]img_index=(\d+)/)?.[1] || null;
 
       let isCarouselPost = !!document
         .querySelector('div[aria-modal="true"][role="dialog"] article')
         .querySelector('button[aria-label="Next"], button[aria-label="Go back"]');
 
-      postMediaDetails = postMediaDetails.map((obj) => ({ postCode, isCarouselPost, ...obj }));
+      postMediaDetails = postMediaDetails.map((obj) => ({ postCode, imgIndex, isCarouselPost, ...obj }));
       return postMediaDetails;
     });
   };
@@ -199,14 +205,14 @@ class InstaScraper {
 
   downloadCarousel = async (postMediaDetailsArray, capture) => {
     try {
-      let currentCarouselPost, newPostMediaDetailsArray, postDetails;
+      let currentCarouselPost, newPostMediaDetailsArray;
       let carouselPostsDetailsArr = [];
       let index = 1;
       while (true) {
         currentCarouselPost = postMediaDetailsArray[0];
         currentCarouselPost.imgIndex = index;
 
-        postDetails = await this.downloadPostMedia(currentCarouselPost, capture);
+        currentCarouselPost = await this.downloadPostMedia(currentCarouselPost, capture);
 
         carouselPostsDetailsArr.push(currentCarouselPost);
 
